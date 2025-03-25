@@ -1,56 +1,25 @@
 [中文阅读](README_zh_cn.md)
 [日本語で読む](README_ja_jp.md)
 
-<p align="center"> 
-  <img src="https://github.com/user-attachments/assets/efb402a1-0b09-41e0-a6cb-259d442e76aa">
+# Hunyuan3D-2GP: 3D Generation for the GPU Poor
+*GPU Poor version by **DeepBeepMeep**. This great video generator can now run smoothly with less than 6 GB of VRAM.*
+<BR>
 
-</p>
-
-<div align="center">
-  <a href=https://3d.hunyuan.tencent.com target="_blank"><img src=https://img.shields.io/badge/Official%20Site-333399.svg?logo=homepage height=22px></a>
-  <a href=https://huggingface.co/spaces/tencent/Hunyuan3D-2  target="_blank"><img src=https://img.shields.io/badge/%F0%9F%A4%97%20Demo-276cb4.svg height=22px></a>
-  <a href=https://huggingface.co/tencent/Hunyuan3D-2 target="_blank"><img src=https://img.shields.io/badge/%F0%9F%A4%97%20Models-d96902.svg height=22px></a>
-  <a href=https://3d-models.hunyuan.tencent.com/ target="_blank"><img src= https://img.shields.io/badge/Page-bb8a2e.svg?logo=github height=22px></a>
-  <a href=https://discord.gg/dNBrdrGGMa target="_blank"><img src= https://img.shields.io/badge/Discord-white.svg?logo=discord height=22px></a>
-  <a href=https://arxiv.org/abs/2501.12202 target="_blank"><img src=https://img.shields.io/badge/Report-b5212f.svg?logo=arxiv height=22px></a>
-  <a href=https://x.com/txhunyuan target="_blank"><img src=https://img.shields.io/badge/Hunyuan-black.svg?logo=x height=22px></a>
- <a href="#community-resources" target="_blank"><img src=https://img.shields.io/badge/Community-lavender.svg?logo=homeassistantcommunitystore height=22px></a>
-</div>
-
-[//]: # (  <a href=# target="_blank"><img src=https://img.shields.io/badge/Report-b5212f.svg?logo=arxiv height=22px></a>)
-
-[//]: # (  <a href=# target="_blank"><img src= https://img.shields.io/badge/Colab-8f2628.svg?logo=googlecolab height=22px></a>)
-
-[//]: # (  <a href="#"><img alt="PyPI - Downloads" src="https://img.shields.io/pypi/v/mulankit?logo=pypi"  height=22px></a>)
-
-<br>
+This is another integration of the *mmgp* module that allows easy to setup advanced and fast offloading.\
+https://github.com/deepbeepmeep/mmgp
 
 
-> 🔥🔥🔥 **New**: 
-> 
-> Release 🤗 [Hunyuan3D-2-Turbo](https://huggingface.co/tencent/Hunyuan3D-2/tree/main/hunyuan3d-dit-v2-0-turbo) and
-> 🤗 [Hunyuan3D-2mini-Turbo](https://huggingface.co/tencent/Hunyuan3D-2mini/tree/main/hunyuan3d-dit-v2-mini-turbo) and [FlashVDM](https://github.com/Tencent/FlashVDM).
-> 
-> Release 🤗 [Hunyuan3D-2mv](https://huggingface.co/tencent/Hunyuan3D-2mv) and
-> 🤗 [Hunyuan3D-2mini](https://huggingface.co/tencent/Hunyuan3D-2mini).
-
-> Join our **[Wechat](#)** and **[Discord](https://discord.gg/dNBrdrGGMa)** group to discuss and find help from us.
-
-| Wechat Group                                     | Xiaohongshu                                           | X                                           | Discord                                           |
-|--------------------------------------------------|-------------------------------------------------------|---------------------------------------------|---------------------------------------------------|
-| <img src="assets/qrcode/wechat.png"  height=140> | <img src="assets/qrcode/xiaohongshu.png"  height=140> | <img src="assets/qrcode/x.png"  height=140> | <img src="assets/qrcode/discord.png"  height=140> |        
-
----
-
-<p align="center">
-“ Living out everyone’s imagination on creating and manipulating 3D assets.”
-</p>
-
-https://github.com/user-attachments/assets/a2cbc5b8-be22-49d7-b1c3-7aa2b20ba460
 
 
 
 ## 🔥 News
+- Mar 18, 2025: 💬 Hunyuan3D-2.0GP by Deepbeepmeep: Support for Hunyuan3D turbo models
+- Mar 18, 2025: 💬 Hunyuan3D-2.0GP by Deepbeepmeep: Support for Hunyuan3D-2mv and  Hunyuan3D-2mini
+- Jan 25, 2025: 💬 Hunyuan3D-2.0GP by Deepbeepmeep: Synced code with original repo.Many thanks to YanWenKun for the work.
+- Jan 23, 2025: 💬 Hunyuan3D-2.0GP by Deepbeepmeep: added lighning fix in rendering window
+- Jan 23, 2025: 💬 Hunyuan3D-2.0GP by Deepbeepmeep: added Windows support thanks to MrForExample and sdbds + omitted optimization that keeps under VRAM 6GB with profile 4 or 5
+- Jan 22, 2025: 💬 Hunyuan3D-2.0GP by Deepbeepmeep: low VRAM support and unlocked text to 3D generator
+- Jan 21, 2025: 💬 Release [Hunyuan3D 2.0](https://huggingface.co/spaces/tencent/Hunyuan3D-2). Please give it a try!
 
 - Mar 19, 2025: 🤗 Release turbo model [Hunyuan3D-2-Turbo](https://huggingface.co/tencent/Hunyuan3D-2/), [Hunyuan3D-2mini-Turbo](https://huggingface.co/tencent/Hunyuan3D-2mini/) and [FlashVDM](https://github.com/Tencent/FlashVDM).
 - Mar 18, 2025: 🤗 Release multiview shape model [Hunyuan3D-2mv](https://huggingface.co/tencent/Hunyuan3D-2mv) and 0.6B
@@ -88,13 +57,82 @@ We systematically evaluate our models, showing that Hunyuan3D 2.0 outperforms pr
 including the open-source models and closed-source models in geometry details, condition alignment, texture quality, and
 e.t.c.
 
+## How to run the Gradio app
+1) Follow the installation instructions below
+
+2) Enter either one of the commande lines in bash session
+ 
+To run the Hunyuan3D-2mini (low VRAM) image to 3D generator:
+```bash
+python gradio_app.py 
+```
+
+To run the Hunyuan3D-2mv (multi views) image to 3D generator:
+```bash
+python gradio_app.py --mv
+```
+
+To run the text to 3D generator (an extension of the mini generator):
+```bash
+python gradio_app.py --enable_t23d
+```
+
+To run the original Hunyuan3D-2 image to 3D generator:
+```bash
+python gradio_app.py --h2
+```
+
+To use the Turbo version of one specific model, add *--turbo*. For instance to run the turbo Hunyuan3D-2mv (multi views) image to 3D generator:
+```bash
+python gradio_app.py --mv --turbo
+```
 
 
-<p align="center">
-  <img src="assets/images/system.jpg">
-</p>
 
-## ☯️ **Hunyuan3D 2.0**
+By default the memory profile assumes 9 GB of VRAM *(profile 3)*. If you have less but at least 6 GB of VRAM add *--profile 4*
+
+To run the image to 3D generator with optimized memory management:
+```bash
+python gradio_app.py --profile 3
+
+```
+To run the text to 3D generator with optimized memory management:
+```bash
+python gradio_app.py --enable_t23d --profile 4
+
+```
+
+You can choose between 5 profiles depending on your hardware:
+- HighRAM_HighVRAM  (1) 
+- HighRAM_LowVRAM  (2)
+- LowRAM_HighVRAM  (3)
+- LowRAM_LowVRAM  (4)
+- VerylowRAM_LowVRAM  (5) 
+
+Each profile's name describes the targeted level of RAM and VRAM consumptions.\
+Usualy the lower the profile number the faster the generation.
+
+## Other GPU Poor Applications
+
+- Wan2GP: https://github.com/deepbeepmeep/Wan2GP :\
+Another great 3D Image to Video and Text to Video generator. It can run on very low config as one its models is only 1.5 B parameters
+
+- HuanyuanVideoGP: https://github.com/deepbeepmeep/HunyuanVideoGP :\
+One of the best open source Text to Video generator
+
+- FluxFillGP: https://github.com/deepbeepmeep/FluxFillGP :\
+One of the best inpainting / outpainting tools based on Flux that can run with less than 12 GB of VRAM.
+
+- Cosmos1GP: https://github.com/deepbeepmeep/Cosmos1GP :\
+This application include two models: a text to world generator and a image / video to world (probably the best open source image to video generator).
+
+- OminiControlGP: https://github.com/deepbeepmeep/OminiControlGP :\
+A Flux derived application very powerful that can be used to transfer an object of your choice in a prompted scene. With mmgp you can run it with only 6 GB of VRAM.
+
+- YuE GP: https://github.com/deepbeepmeep/YuEGP :\
+A great song generator (instruments + singer's voice) based on prompted Lyrics and a genre description. Thanks to mmgp you can run it with less than 10 GB of VRAM without waiting forever.
+
+
 
 ### Architecture
 
@@ -122,8 +160,8 @@ and the condition following ability.
 
 Generation results of Hunyuan3D 2.0:
 <p align="left">
-  <img src="assets/images/e2e-1.gif"  height=250>
-  <img src="assets/images/e2e-2.gif"  height=250>
+  <img src="assets/images/e2e-1.gif"  height=300>
+  <img src="assets/images/e2e-2.gif"  height=300>
 </p>
 
 ## 🎁 Models Zoo
@@ -168,10 +206,19 @@ Hunyuan3D 2.0 supports Macos, Windows, Linux. You may follow the next steps to u
 - [Official Site](#official-site)
 
 ### Install Requirements
-
-Please install Pytorch via the [official](https://pytorch.org/) site. Then install the other requirements via
-
+To use the application on Windows (without WSL) you will need to install Microsoft Visual Studio 2022 or later. If you get an error during the execution of onr of the *python setup.py* below you will need to set the path to the C++ compiler by running the following script (once you have located the installation path of VS Studio which may differ):
 ```bash
+"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\Tools\VsDevCmd" -arch=x64 
+```
+
+
+In any case please make sure you have Python 3.10 installed, you may create a conda environnment: 
+```bash
+conda create -n Hunyuan3D-2GP python==3.10.9 
+```
+Then install the required libraries:
+```bash
+pip install torch==2.5.1 torchvision torchaudio --index-url https://download.pytorch.org/whl/test/cu124
 pip install -r requirements.txt
 # for texture
 cd hy3dgen/texgen/custom_rasterizer
@@ -216,31 +263,7 @@ Please visit [examples](examples) folder for more advanced usage, such as **mult
 *texture generation
 for handcrafted mesh**.
 
-### Gradio App
 
-You could also host a [Gradio](https://www.gradio.app/) App in your own computer via:
-
-Standard Version
-
-```bash
-# Hunyuan3D-2mini
-python3 gradio_app.py --model_path tencent/Hunyuan3D-2mini --subfolder hunyuan3d-dit-v2-mini --texgen_model_path tencent/Hunyuan3D-2 --low_vram_mode
-# Hunyuan3D-2mv
-python3 gradio_app.py --model_path tencent/Hunyuan3D-2mv --subfolder hunyuan3d-dit-v2-mv --texgen_model_path tencent/Hunyuan3D-2 --low_vram_mode
-# Hunyuan3D-2
-python3 gradio_app.py --model_path tencent/Hunyuan3D-2 --subfolder hunyuan3d-dit-v2-0 --texgen_model_path tencent/Hunyuan3D-2 --low_vram_mode
-```
-
-Turbo Version
-
-```bash
-# Hunyuan3D-2mini
-python3 gradio_app.py --model_path tencent/Hunyuan3D-2mini --subfolder hunyuan3d-dit-v2-mini-turbo --texgen_model_path tencent/Hunyuan3D-2 --low_vram_mode --enable_flashvdm
-# Hunyuan3D-2mv
-python3 gradio_app.py --model_path tencent/Hunyuan3D-2mv --subfolder hunyuan3d-dit-v2-mv-turbo --texgen_model_path tencent/Hunyuan3D-2 --low_vram_mode --enable_flashvdm
-# Hunyuan3D-2
-python3 gradio_app.py --model_path tencent/Hunyuan3D-2 --subfolder hunyuan3d-dit-v2-0-turbo --texgen_model_path tencent/Hunyuan3D-2 --low_vram_mode --enable_flashvdm
-```
 
 ### API Server
 
@@ -278,13 +301,12 @@ Don't forget to visit [Hunyuan3D](https://3d.hunyuan.tencent.com) for quick use,
 
 - [x] Inference Code
 - [x] Model Checkpoints
-- [x] Technical Report
 - [ ] ComfyUI
 - [ ] TensorRT Version
 
 ## 🔗 BibTeX
 
-If you found this repository helpful, please cite our reports:
+If you found this repository helpful, please cite our report:
 
 ```bibtex
 @misc{hunyuan3d22025tencent,

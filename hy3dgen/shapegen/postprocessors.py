@@ -63,6 +63,9 @@ def pymeshlab2trimesh(mesh: pymeshlab.MeshSet):
     with tempfile.NamedTemporaryFile(suffix='.ply', delete=False) as temp_file:
         mesh.save_current_mesh(temp_file.name)
         mesh = trimesh.load(temp_file.name)
+
+    if os.path.isfile(temp_file.name):
+        os.remove(temp_file.name)
     # 检查加载的对象类型
     if isinstance(mesh, trimesh.Scene):
         combined_mesh = trimesh.Trimesh()
@@ -85,6 +88,9 @@ def trimesh2pymeshlab(mesh: trimesh.Trimesh):
         mesh.export(temp_file.name)
         mesh = pymeshlab.MeshSet()
         mesh.load_new_mesh(temp_file.name)
+    if os.path.isfile(temp_file.name):
+        os.remove(temp_file.name)
+
     return mesh
 
 

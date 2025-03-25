@@ -38,7 +38,7 @@ class Multiview_Diffusion_Net():
                                                                          timestep_spacing='trailing')
 
         pipeline.set_progress_bar_config(disable=True)
-        self.pipeline = pipeline.to(self.device)
+        self.pipeline = pipeline #.to(self.device) # only for cosmetics and not display the warning 
 
     def seed_everything(self, seed):
         random.seed(seed)

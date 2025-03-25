@@ -1,3 +1,4 @@
+gradio_litmodel3d
 ninja
 pybind11
 
@@ -6,13 +7,13 @@ einops
 opencv-python
 numpy
 torch
-transformers
+transformers==4.49.0
 torchvision
 #taming-transformers-rom1504
 #ConfigArgParse
 #ipdb
 omegaconf
-
+diso
 #sentencepiece
 tqdm
 
@@ -32,7 +33,9 @@ accelerate
 
 # Demo only
 gradio
+uvicorn
 fastapi
+mmgp==3.2.7
 uvicorn
 rembg
 onnxruntime

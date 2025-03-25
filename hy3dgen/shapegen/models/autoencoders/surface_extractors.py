@@ -75,10 +75,37 @@ class MCSurfaceExtractor(SurfaceExtractor):
         vertices = vertices / grid_size * bbox_size + bbox_min
         return vertices, faces
 
+import time
+from mmgp import offload
+
+class clock:
+    def __init__(self):
+        self.start_time = 0
+        self.end_time = 0
+
+    @classmethod
+    def start(cls):
+        self = cls()        
+        self.start_time =time.time()
+        return self        
+
+    def stop(self):
+        self.stop_time =time.time()  
+
+    def time_gap(self):
+        return self.stop_time - self.start_time
+    
+    def format_time_gap(self):
+        return f"{self.stop_time - self.start_time:.2f}s"
 
 class DMCSurfaceExtractor(SurfaceExtractor):
     def run(self, grid_logit, *, octree_resolution, **kwargs):
+
+        cl = clock.start()
+
         device = grid_logit.device
+
+
         if not hasattr(self, 'dmc'):
             try:
                 from diso import DiffDMC
@@ -91,6 +118,12 @@ class DMCSurfaceExtractor(SurfaceExtractor):
         verts = center_vertices(verts)
         vertices = verts.detach().cpu().numpy()
         faces = faces.detach().cpu().numpy()[:, ::-1]
+
+        cl.stop()
+        if offload.default_verboseLevel > 1:
+            print(f"Diso device: {device}")
+            print(f"Diso generation time: {cl.format_time_gap()}")
+
         return vertices, faces
 
 
