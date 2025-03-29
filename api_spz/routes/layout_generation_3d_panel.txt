@@ -21,19 +21,20 @@ vgroup padl=4 padr=4 spacing=8 flexibleWidth=1
     
     go minHeight=140 preferredHeight=140 flexibleWidth=1
         hgroup spacing=8 
-            hgroup bg.color=(255,255,255,10) bg.ppu=10 flexibleWidth=2 preferredWidth=100
-                space  flexibleHeight=1  flexibleWidth=1
-                slider code_name=(mesh_simplify)  visible_name=(mesh\nsimplify)  min=0  max=100  default=10  show_n_decimals=0  flexibleHeight=1  
-                space  flexibleHeight=1   flexibleWidth=1  minWidth=10 
-
-            go bg.color=(255,255,255,10) bg.ppu=10  flexibleWidth=1 preferredHeight=60  flexibleWidth=3
-                int_horizontal  code_name=(seed)  visible_name=(seed)  min=-2147483647  max=2147483647  default=1234  as_seed=true  rect.anchors=(0,1,1,1)  rect.offsetMin=(0,-60)
-
             vgroup  padl=10 padr=10 padt=18 padb=20 bg.color=(255,255,255,10) bg.ppu=10  flexibleWidth=1 spacing=8 flexibleHeight=1
                 go rect.offsetMin=(2,0)  minHeight=30  preferredHeight=30  flexibleWidth=1  preferredWidth=90
                     toggle  code_name=(apply_texture)  visible_name=(apply\ntexture)  default=false 
                 space flexibleHeight=1
                 go rect.offsetMin=(2,0)  minHeight=30  preferredHeight=30  flexibleWidth=1 
                     int_horizontal  code_name=(texture_size)  visible_name=(texture size)  min=512  max=4096  default=1024  flexibleWidth=1  rect.offsetMin=(0,-10)
+
+            go bg.color=(255,255,255,10) bg.ppu=10  flexibleWidth=1 preferredHeight=60  flexibleWidth=3
+                int_horizontal  code_name=(seed)  visible_name=(seed)  min=-2147483647  max=2147483647  default=1234  as_seed=true  rect.anchors=(0,1,1,1)  rect.offsetMin=(0,-60)
+
+            hgroup bg.color=(255,255,255,10) bg.ppu=10 padl=6 flexibleWidth=2 preferredWidth=100
+                space  flexibleHeight=1  flexibleWidth=1
+                slider code_name=(mesh_simplify)  visible_name=(mesh\nsimplify)  min=0  max=100  default=10  show_n_decimals=0  flexibleHeight=1  
+                space  flexibleHeight=1   flexibleWidth=1  minWidth=10 
+            
 
           
