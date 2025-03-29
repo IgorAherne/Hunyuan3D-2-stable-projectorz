@@ -1,0 +1,39 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Hunyuan3D API - Single View (Low VRAM)",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/api_spz/main_api.py",
+            "args": [
+                "--model-path", "tencent/Hunyuan3D-2mini", 
+                "--subfolder", "hunyuan3d-dit-v2-mini-turbo",
+                "--texgen-model-path", "tencent/Hunyuan3D-2",
+                "--device", "cuda",
+                "--host", "127.0.0.1",
+                "--port", "7960",
+                "--low-vram-mode"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "Hunyuan3D API - Multi View (Low VRAM)",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/api_spz/main_api.py",
+            "args": [
+                "--model-path", "tencent/Hunyuan3D-2mv", 
+                "--subfolder", "hunyuan3d-dit-v2-mv-turbo",
+                "--texgen-model-path", "tencent/Hunyuan3D-2",
+                "--device", "cuda",
+                "--host", "127.0.0.1",
+                "--port", "7960",
+                "--low-vram-mode"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": true
+        }
+    ]
+}

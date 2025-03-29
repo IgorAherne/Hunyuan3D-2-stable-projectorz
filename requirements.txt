@@ -6,12 +6,8 @@ einops
 opencv-python
 numpy<2.0
 transformers
-#taming-transformers-rom1504
-#ConfigArgParse
-#ipdb
 omegaconf
 
-#sentencepiece
 tqdm
 
 # Mesh Processing
@@ -19,14 +15,9 @@ trimesh
 pymeshlab
 pygltflib
 xatlas
-#kornia
-#facexlib
 
 # Training
 accelerate
-#pytorch_lightning
-#scikit-learn
-#scikit-image
 
 # Demo only
 gradio
@@ -34,5 +25,3 @@ fastapi
 uvicorn
 rembg
 onnxruntime
-#gevent
-#geventhttpclient
