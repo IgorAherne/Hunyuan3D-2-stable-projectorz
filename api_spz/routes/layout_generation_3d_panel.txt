@@ -7,7 +7,7 @@ vgroup padl=4 padr=4 spacing=8 flexibleWidth=1
         hgroup spacing=8
             hgroup bg.color=(255,255,255,10) bg.ppu=10 flexibleWidth=1
                 space minWidth=20  flexibleHeight=1  flexibleWidth=1
-                slider  code_name=(guidance_scale)  visible_name=(guidance\nscale)  min=1.0  max=10.0  default=5.0  flexibleHeight=1
+                slider  code_name=(guidance_scale)  visible_name=(guidance\nscale)  min=1  max=10  default=5  flexibleHeight=1
                 space  minWidth=20  preferredWidth=30  flexibleHeight=1
                 slider  code_name=(num_inference_steps)  visible_name=(inference\nsteps)  min=1  max=50  default=20  flexibleHeight=1
                 space  minWidth=20   flexibleHeight=1  flexibleWidth=1
