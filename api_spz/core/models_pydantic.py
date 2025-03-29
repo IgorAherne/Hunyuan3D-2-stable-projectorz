@@ -19,7 +19,7 @@ class GenerationArgForm:
         num_inference_steps: int = Form(20),
         octree_resolution: int = Form(256),
         num_chunks: int = Form(80),
-        mesh_simplify_ratio: float = Form(0.3),
+        mesh_simplify_ratio: float = Form(0.1),
         apply_texture: bool = Form(False),
         texture_size: int = Form(1024),
         output_format: str = Form("glb"),
