@@ -88,20 +88,19 @@ def _gen_3d_validate_params(file_or_files, b64_or_b64list, arg: GenerationArgFor
     if (not file_or_files or len(file_or_files) == 0) and (not b64_or_b64list or len(b64_or_b64list) == 0):
         raise HTTPException(400, "No input images provided")
     # Range checks:
-    if not (0 < arg.ss_guidance_strength <= 10):
-        raise HTTPException(status_code=400, detail="SS guidance strength must be above 0 and <= 10")
-    if not (0 < arg.ss_sampling_steps <= 50):
-        raise HTTPException(status_code=400, detail="SS sampling steps must be above 0 and <= 50")
-    if not (0 < arg.slat_sampling_steps <= 50):
-        raise HTTPException(status_code=400, detail="Slat sampling steps must be above 0 and <= 50")
-    if not (0 < arg.slat_guidance_strength <= 10):
-        raise HTTPException(status_code=400, detail="Slat guidance strength must be above 0 and <= 10")
-    if not (15 < arg.preview_frames <= 1000):
-        raise HTTPException(status_code=400, detail="Preview frames must be above 15 and <= 1000")
+    if not (0 < arg.guidance_scale <= 10):
+        raise HTTPException(status_code=400, detail="Guidance scale must be above 0 and <= 10")
+    if not (0 < arg.num_inference_steps <= 50):
+        raise HTTPException(status_code=400, detail="Inference steps must be above 0 and <= 50")
+    if not (128 <= arg.octree_resolution <= 512):
+        raise HTTPException(status_code=400, detail="Octree resolution must be between 128 and 512")
+    if not (1000 <= arg.num_chunks <= 200000):
+        raise HTTPException(status_code=400, detail="Number of chunks must be between 1000 and 200000")
     if not (0 < arg.mesh_simplify_ratio <= 100): 
         raise HTTPException(status_code=400, detail="mesh_simplify_ratio must be between 0 and 1, or between 0 and 100")
-
-    if arg.output_format not in ["glb", "gltf"]:
+    if not (512 <= arg.texture_size <= 4096):
+        raise HTTPException(status_code=400, detail="Texture size must be between 512 and 4096")
+    if arg.output_format not in ["glb", "obj"]:
         raise HTTPException(status_code=400, detail="Unsupported output format")
 
 
@@ -170,44 +169,58 @@ async def _run_pipeline_generate_3d(pil_images, arg):
             
             # Common parameters for all pipeline calls
             pipeline_params = {
-                "num_inference_steps": arg.ss_sampling_steps,
-                "guidance_scale": arg.ss_guidance_strength,
+                "num_inference_steps": arg.num_inference_steps,
+                "guidance_scale": arg.guidance_scale,
                 "generator": generator,
+                "octree_resolution": arg.octree_resolution,
+                "num_chunks": arg.num_chunks,
                 "output_type": 'mesh',
             }
             
             # Process input based on type (single image or multi-view)
             if isinstance(pil_images, list):
-                if len(pil_images) > 1:
-                    # Multi-view case - Check if we're using MV model
-                    if "mv" in state.model_path.lower():
-                        # Proper MV model handling
-                        processed_images = {}
-                        view_names = ['front', 'back', 'left', 'right']
-                        for i, img in enumerate(pil_images):
-                            if i < len(view_names):
-                                # Convert to RGB and remove background
-                                processed_image = rembg(img.convert('RGB'))
-                                processed_images[view_names[i]] = processed_image
+                # Check if we're using MV model
+                if "mv" in state.model_path.lower():
+                    # MV models always require a dictionary with view names
+                    processed_images = {}
+                    view_names = ['front', 'back', 'left', 'right']
+                    
+                    # Process available images
+                    for i, img in enumerate(pil_images):
+                        if i < len(view_names):
+                            processed_image = rembg(img.convert('RGB'))
+                            processed_images[view_names[i]] = processed_image
+                    
+                    # MV model always requires at least the front view
+                    if 'front' not in processed_images and len(pil_images) > 0:
+                        processed_images['front'] = rembg(pil_images[0].convert('RGB'))
                         
-                        # Pass the dictionary directly to the pipeline
-                        raw_outputs = pipeline(
-                            image=processed_images,
-                            **pipeline_params
-                        )
-                    else:
-                        # Fallback for non-MV model - use only first image
-                        logger.warning("Using multiple images but not using multiview model. Using only the first image.")
-                        processed_image = rembg(pil_images[0].convert('RGB'))
-                        raw_outputs = pipeline(image=processed_image, **pipeline_params)
+                    # Pass the dictionary directly to the pipeline
+                    raw_outputs = pipeline(
+                        image=processed_images,
+                        **pipeline_params
+                    )
                 else:
-                    # Single image in a list
+                    # Standard model - just use first image
+                    if len(pil_images) > 1:
+                        logger.warning("Using multiple images but not using multiview model. Using only the first image.")
                     processed_image = rembg(pil_images[0].convert('RGB'))
                     raw_outputs = pipeline(image=processed_image, **pipeline_params)
             else:
-                # Single image directly
-                processed_image = rembg(pil_images.convert('RGB'))
-                raw_outputs = pipeline(image=processed_image, **pipeline_params)
+                # Single image directly (not in a list)
+                if "mv" in state.model_path.lower():
+                    # MV model needs dictionary format
+                    processed_images = {
+                        'front': rembg(pil_images.convert('RGB'))
+                    }
+                    raw_outputs = pipeline(
+                        image=processed_images,
+                        **pipeline_params
+                    )
+                else:
+                    # Standard model
+                    processed_image = rembg(pil_images.convert('RGB'))
+                    raw_outputs = pipeline(image=processed_image, **pipeline_params)
             
             # Convert to trimesh and apply post-processing
             mesh = export_to_trimesh(raw_outputs)[0]
@@ -677,17 +690,14 @@ async def process_ui_generation_request(
     try:
         # Extract values from simplified input format
         arg = GenerationArgForm(
-            seed = int(data.get("seed", 1)),
-            ss_guidance_strength = data.get("ss_strength", 7.5),
-            ss_sampling_steps = int(data.get("ss_steps", 12)),
-            slat_guidance_strength = data.get("slat_strength", 3.0),
-            slat_sampling_steps = int(data.get("slat_steps", 12)),
-            preview_resolution = 512,
-            preview_frames     = 150,
-            preview_fps        = 20,
+            seed = int(data.get("seed", 1234)),
+            guidance_scale = data.get("guidance_scale", 5.0),
+            num_inference_steps = int(data.get("num_inference_steps", 20)),
+            octree_resolution = int(data.get("octree_resolution", 256)),
+            num_chunks = int(data.get("num_chunks", 8000)),
             mesh_simplify_ratio = data.get("mesh_simplify", 0.95),
+            apply_texture = data.get("apply_texture", False),
             texture_size = int(data.get("texture_size", 1024)),
-            apply_texture = data.get("apply_texture", False), 
             output_format = "glb"
         )
         # Get images from input
