@@ -18,8 +18,8 @@ class GenerationArgForm:
         guidance_scale: float = Form(5.0),
         num_inference_steps: int = Form(20),
         octree_resolution: int = Form(256),
-        num_chunks: int = Form(8000),
-        mesh_simplify_ratio: float = Form(0.95),
+        num_chunks: int = Form(80),
+        mesh_simplify_ratio: float = Form(0.3),
         apply_texture: bool = Form(False),
         texture_size: int = Form(1024),
         output_format: str = Form("glb"),
@@ -28,7 +28,7 @@ class GenerationArgForm:
         self.guidance_scale = guidance_scale
         self.num_inference_steps = num_inference_steps
         self.octree_resolution = octree_resolution
-        self.num_chunks = num_chunks
+        self.num_chunks = num_chunks*1000
         self.mesh_simplify_ratio = mesh_simplify_ratio
         self.apply_texture = apply_texture
         self.texture_size = texture_size

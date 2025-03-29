@@ -16,14 +16,14 @@ vgroup padl=4 padr=4 spacing=8 flexibleWidth=1
                 space  minWidth=20  flexibleHeight=1  flexibleWidth=1
                 slider  code_name=(octree_resolution)  visible_name=(octree\nresolution)  min=128  max=512  default=256  show_n_decimals=0  flexibleHeight=1
                 space  minWidth=20  preferredWidth=30  flexibleHeight=1
-                slider  code_name=(num_chunks)  visible_name=(num\nchunks)  min=1000  max=200000  default=8000  show_n_decimals=0  flexibleHeight=1
+                slider  code_name=(num_chunks)  visible_name=(num\nchunks)  min=1  max=200  default=80  show_n_decimals=0  flexibleHeight=1
                 space  minWidth=20  flexibleHeight=1  flexibleWidth=1
     
     go minHeight=140 preferredHeight=140 flexibleWidth=1
         hgroup spacing=8 
             hgroup bg.color=(255,255,255,10) bg.ppu=10 flexibleWidth=2 preferredWidth=100
                 space  flexibleHeight=1  flexibleWidth=1
-                slider code_name=(mesh_simplify)  visible_name=(mesh\nsimplify)  min=0  max=100  default=95  show_n_decimals=0  flexibleHeight=1  
+                slider code_name=(mesh_simplify)  visible_name=(mesh\nsimplify)  min=0  max=100  default=30  show_n_decimals=0  flexibleHeight=1  
                 space  flexibleHeight=1   flexibleWidth=1  minWidth=10 
 
             go bg.color=(255,255,255,10) bg.ppu=10  flexibleWidth=1 preferredHeight=60  flexibleWidth=3

@@ -368,7 +368,7 @@ async def generate_no_preview(
 ):
     """Generate a 3D model directly (no preview)."""
     print()#empty line, for an easier read.
-    logger.info("Client asked to generate with no previews")
+    logger.info("Client asked to generate")
     # Acquire the lock (non-blocking)
     try:
         await asyncio.wait_for(generation_lock.acquire(), timeout=0.001)
@@ -496,7 +496,7 @@ async def generate_multi_no_preview(
     The pipeline will receive [img1, img2, ...] as input.
     """
     print()#empty line, for an easier read.
-    logger.info("Client asked to multi-generate with no previews")
+    logger.info("Client asked to multi-view-generate")
     try:
         await asyncio.wait_for(generation_lock.acquire(), timeout=0.001)
     except asyncio.TimeoutError:
@@ -560,7 +560,7 @@ async def generate_multi_preview(
     Let user resume with /resume_from_preview
     """
     print()#empty line, for an easier read.
-    logger.info("Client asked to multi-generate with previews")
+    logger.info("Client asked to multi-view-generate")
     try:
         await asyncio.wait_for(generation_lock.acquire(), timeout=0.001)
     except asyncio.TimeoutError:
