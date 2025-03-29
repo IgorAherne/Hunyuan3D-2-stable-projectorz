@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Generation API Documentation</title>
+    <style>
+        :root {
+            --primary-color: #c4b5fd;
+            --text-color: #d1d5db;
+            --bg-color: #0f172a;
+            --code-bg: #1e293b;
+            --border-color: #334155;
+            --endpoint-bg: #1e293b;
+            --nav-bg: #1e293b;
+            --description-color: #94a3b8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background: var(--bg-color);
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            color: var(--primary-color);
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            margin: 2rem 0 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border-color);
+            color: var(--primary-color);
+        }
+
+        h3 {
+            color: var(--text-color);
+            margin: 1rem 0;
+        }
+
+        .endpoint {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--endpoint-bg);
+        }
+
+        .endpoint:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .workflow-option {
+            margin: 1rem 0;
+            padding: 1rem;
+            background: var(--code-bg);
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+        }
+
+        .workflow-option h4 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .workflow-option ol {
+            margin-left: 1.5rem;
+            color: var(--text-color);
+        }
+
+        .workflow-option li {
+            margin: 0.5rem 0;
+        }
+
+        .method {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-right: 1rem;
+        }
+
+        .get {
+            background: #10B981;
+            color: white;
+        }
+
+        .post {
+            background: #3B82F6;
+            color: white;
+        }
+
+        .endpoint-path {
+            font-family: monospace;
+            font-size: 1.1rem;
+            color: var(--text-color);
+        }
+
+        .description {
+            margin: 1rem 0;
+            color: var(--description-color);
+        }
+
+        .parameters {
+            margin: 1rem 0;
+        }
+
+        code {
+            background: var(--code-bg);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: monospace;
+            color: var(--text-color);
+        }
+
+        pre {
+            background: var(--code-bg);
+            padding: 1rem;
+            border-radius: 4px;
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: var(--text-color);
+        }
+
+        .parameter {
+            margin: 0.5rem 0;
+            padding: 0.5rem;
+            background: var(--code-bg);
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+        }
+
+        .parameter-name {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .top-nav {
+            position: sticky;
+            top: 0;
+            background: var(--nav-bg);
+            padding: 1rem 0;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+        }
+
+        .nav-list {
+            list-style: none;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-list a {
+            color: var(--text-color);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .nav-list a:hover {
+            background: var(--code-bg);
+            color: var(--primary-color);
+        }
+
+        .response {
+            margin-top: 1rem;
+            color: var(--text-color);
+        }
+
+        .response strong {
+            color: var(--primary-color);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<div class="container">
+        <h1>3D Generation API Documentation</h1>
+        
+		<div class="endpoint" style="margin-top: -1rem; margin-bottom: 2rem;">
+			<p style="color: var(--description-color);">
+				<strong style="color: var(--primary-color);">Last Updated:</strong> January 4, 2025
+			</p>
+		</div>
+
+        <section id="workflow">
+            <h2>Generation Workflows</h2>
+
+            <div class="endpoint">
+                <h3>Single Image Workflow</h3>
+                <p class="description">There are two possible flows when generating from a single image:</p>
+                
+                <div class="workflow-option">
+                    <h4>Option 1: Direct Generation (No Preview)</h4>
+                    <ol>
+                        <li>POST to <code>/generate_no_preview</code> with your base64 image and parameters</li>
+                        <li>Poll <code>/status</code> until completion</li>
+                        <li>GET <code>/download/model</code> to obtain the final GLB</li>
+                    </ol>
+                </div>
+
+                <div class="workflow-option">
+                    <h4>Option 2: With Preview</h4>
+                    <ol>
+                        <li>POST to <code>/generate_preview</code> with your base64 image and parameters</li>
+                        <li>Poll <code>/status</code> until preview is ready</li>
+                        <li>GET <code>/download/preview/{type}</code> to view the previews</li>
+                        <li>If satisfied, POST to <code>/resume_from_preview</code></li>
+                        <li>Poll <code>/status</code> until completion</li>
+                        <li>GET <code>/download/model</code> to obtain the final GLB</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <h3>Multi-Image Workflow</h3>
+                <p class="description">Similarly, there are two flows for multi-image generation:</p>
+                
+                <div class="workflow-option">
+                    <h4>Option 1: Direct Generation (No Preview)</h4>
+                    <ol>
+                        <li>POST to <code>/generate_multi_no_preview</code> with your base64 images and parameters</li>
+                        <li>Poll <code>/status</code> until completion</li>
+                        <li>GET <code>/download/model</code> to obtain the final GLB</li>
+                    </ol>
+                </div>
+
+                <div class="workflow-option">
+                    <h4>Option 2: With Preview</h4>
+                    <ol>
+                        <li>POST to <code>/generate_multi_preview</code> with your base64 images and parameters</li>
+                        <li>Poll <code>/status</code> until preview is ready</li>
+                        <li>GET <code>/download/preview/{type}</code> to view the previews</li>
+                        <li>If satisfied, POST to <code>/resume_from_preview</code></li>
+                        <li>Poll <code>/status</code> until completion</li>
+                        <li>GET <code>/download/model</code> to obtain the final GLB</li>
+                    </ol>
+                </div>
+            </div>
+        </section>
+        
+        <section id="examples">
+            <h2>Code Examples</h2>
+            
+            <div class="endpoint">
+                <h3>Single Image Generation (Python)</h3>
+                <pre><code>import requests
+import base64
+import time
+
+# API endpoint
+BASE_URL = "http://127.0.0.1:7960"
+
+def generate_no_preview(image_base64: str):
+    """Generate 3D model from a single base64-encoded image without previews.
+    
+    Args:
+        image_base64: Base64 string of the image (without 'data:image/...' prefix)
+    """
+    try:
+        # Set generation parameters
+        params = {
+            'image_base64': image_base64,
+            'seed': 42,
+            'ss_guidance_strength': 7.5,
+            'ss_sampling_steps': 30,
+            'slat_guidance_strength': 7.5,
+            'slat_sampling_steps': 30,
+            'mesh_simplify_ratio': 0.95,
+            'texture_size': 1024,
+            'output_format': 'glb'
+        }
+        
+        # Start generation
+        print("Starting generation...")
+        response = requests.post(f"{BASE_URL}/generate_no_preview", data=params)
+        response.raise_for_status()
+        
+        # Poll status until complete
+        while True:
+            status = requests.get(f"{BASE_URL}/status").json()
+            print(f"Progress: {status['progress']}%")
+            
+            if status['status'] == 'COMPLETE':
+                break
+            elif status['status'] == 'FAILED':
+                raise Exception(f"Generation failed: {status['message']}")
+            
+            time.sleep(1)
+        
+        # Download the model
+        print("Downloading model...")
+        response = requests.get(f"{BASE_URL}/download/model")
+        response.raise_for_status()
+        
+        return response.content
+        
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        return None</code></pre>
+            </div>
+
+            <div class="endpoint">
+                <h3>Multi-Image Generation (Python)</h3>
+                <pre><code>def generate_multi_preview(image_base64_list: list[str]):
+    """Generate 3D model from multiple base64-encoded images with previews.
+    
+    Args:
+        image_base64_list: List of base64 strings (without 'data:image/...' prefix)
+    """
+    try:
+        # Set generation parameters
+        params = {
+            'image_list_base64': image_base64_list,
+            'seed': 42,
+            'ss_guidance_strength': 7.5,
+            'ss_sampling_steps': 30,
+            'slat_guidance_strength': 7.5,
+            'slat_sampling_steps': 30,
+            'preview_resolution': 512,
+            'preview_frames': 30,
+            'preview_fps': 30,
+            'mesh_simplify_ratio': 0.95,
+            'texture_size': 1024,
+            'output_format': 'glb'
+        }
+        
+        # Start generation with preview
+        print("Starting generation...")
+        response = requests.post(f"{BASE_URL}/generate_multi_preview", data=params)
+        response.raise_for_status()
+        
+        # Poll until preview is ready
+        while True:
+            status = requests.get(f"{BASE_URL}/status").json()
+            print(f"Progress: {status['progress']}%")
+            
+            if status['status'] == 'PREVIEW_READY':
+                break
+            elif status['status'] == 'FAILED':
+                raise Exception(f"Generation failed: {status['message']}")
+            
+            time.sleep(1)
+        
+        # Download preview video
+        print("Downloading preview...")
+        preview = requests.get(f"{BASE_URL}/download/preview/gaussian")
+        preview.raise_for_status()
+        
+        # Resume generation to get final model
+        print("Resuming generation for final model...")
+        resume_params = {
+            'mesh_simplify_ratio': 0.95,
+            'texture_size': 1024
+        }
+        response = requests.post(f"{BASE_URL}/resume_from_preview", params=resume_params)
+        response.raise_for_status()
+        
+        # Wait for final model
+        while True:
+            status = requests.get(f"{BASE_URL}/status").json()
+            print(f"Progress: {status['progress']}%")
+            
+            if status['status'] == 'COMPLETE':
+                break
+            elif status['status'] == 'FAILED':
+                raise Exception(f"Final generation failed: {status['message']}")
+            
+            time.sleep(1)
+        
+        # Download final model
+        print("Downloading final model...")
+        model = requests.get(f"{BASE_URL}/download/model")
+        model.raise_for_status()
+        
+        return {
+            'preview': preview.content,
+            'model': model.content
+        }
+        
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        return None</code></pre>
+            </div>
+        </section>
+        
+        <nav class="top-nav">
+            <ul class="nav-list">
+                <li><a href="#workflow">Workflows</a></li>
+                <li><a href="#examples">Code Examples</a></li>
+                <li><a href="#status-endpoints">Status Endpoints</a></li>
+                <li><a href="#generation-endpoints">Generation Endpoints</a></li>
+                <li><a href="#preview-endpoints">Preview Endpoints</a></li>
+                <li><a href="#download-endpoints">Download Endpoints</a></li>
+            </ul>
+        </nav>
+
+        <section id="status-endpoints">
+            <h2>Status Endpoints</h2>
+            
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="endpoint-path">/ping</span>
+                <p class="description">Check server status and availability.</p>
+                <div class="response">
+                    <strong>Response:</strong>
+                    <pre><code>{
+    "status": "running",
+    "message": "Trellis API is operational",
+    "busy": boolean
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="endpoint-path">/status</span>
+                <p class="description">Get the status of the current or last generation.</p>
+                <div class="response">
+                    <strong>Response:</strong>
+                    <pre><code>{
+    "status": string,
+    "progress": number,
+    "message": string,
+    "busy": boolean
+}</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <section id="generation-endpoints">
+            <h2>Generation Endpoints</h2>
+            
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <span class="endpoint-path">/generate_no_preview</span>
+                <p class="description">Generate a 3D model without previews. Download GLB when complete.</p>
+                <div class="parameters">
+                    <strong>Parameters:</strong>
+                    <div class="parameter">
+                        <span class="parameter-name">image_base64</span>: string (required)
+                        <p>Base64-encoded image data (without 'data:image/...' prefix)</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <span class="endpoint-path">/generate_preview</span>
+                <p class="description">Generate a 3D structure with previews. Download videos when ready.</p>
+                <div class="parameters">
+                    <strong>Parameters:</strong>
+                    <div class="parameter">
+                        <span class="parameter-name">image_base64</span>: string (required)
+                        <p>Base64-encoded image data (without 'data:image/...' prefix)</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <span class="endpoint-path">/generate_multi_no_preview</span>
+                <p class="description">Generate a 3D model using multiple images without previews.</p>
+                <div class="parameters">
+                    <strong>Parameters:</strong>
+                    <div class="parameter">
+                        <span class="parameter-name">image_list_base64</span>: list[string] (required)
+                        <p>List of base64-encoded images (without 'data:image/...' prefix)</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <span class="endpoint-path">/generate_multi_preview</span>
+                <p class="description">Generate previews using multiple images.</p>
+                <div class="parameters">
+                    <strong>Parameters:</strong>
+                    <div class="parameter">
+                        <span class="parameter-name">image_list_base64</span>: list[string] (required)
+                        <p>List of base64-encoded images (without 'data:image/...' prefix)</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <span class="endpoint-path">/resume_from_preview</span>
+                <p class="description">Continue generation from a preview-ready state to create the final GLB model.</p>
+                <div class="parameters">
+                    <strong>Parameters:</strong>
+                    <div class="parameter">
+                        <span class="parameter-name">mesh_simplify_ratio</span>: float (0-1, default: 0.95)
+                        <p>Ratio for mesh simplification</p>
+                    </div>
+                    <div class="parameter">
+                        <span class="parameter-name">texture_size</span>: int (0-4096, default: 1024)
+                        <p>Size of the output texture</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="preview-endpoints">
+            <h2>Preview Control</h2>
+            
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <span class="endpoint-path">/interrupt</span>
+                <p class="description">Cancel the current generation process.</p>
+            </div>
+        </section>
+
+        <section id="download-endpoints">
+            <h2>Download Endpoints</h2>
+            
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="endpoint-path">/download/preview/{type}</span>
+                <p class="description">Download preview video. Type can be: "gaussian" or "mesh".</p>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="endpoint-path">/download/model</span>
+                <p class="description">Download the final 3D model (GLB format, with texture).</p>
+            </div>
+        </section>
+
+        <section id="common-parameters">
+            <h2>Common Generation Parameters</h2>
+            <div class="endpoint">
+                <div class="parameters">
+                    <div class="parameter">
+                        <span class="parameter-name">seed</span>: int
+                        <p>Random seed for generation</p>
+                    </div>
+                    <div class="parameter">
+                        <span class="parameter-name">ss_guidance_strength</span>: float (0-10)
+                        <p>Structure sampling guidance strength</p>
+                    </div>
+                    <div class="parameter">
+                        <span class="parameter-name">ss_sampling_steps</span>: int (0-50)
+                        <p>Structure sampling steps</p>
+                    </div>
+                    <div class="parameter">
+                        <span class="parameter-name">slat_guidance_strength</span>: float (0-10)
+                        <p>SLAT guidance strength</p>
+                    </div>
+                    <div class="parameter">
+                        <span class="parameter-name">slat_sampling_steps</span>: int (0-50)
+                        <p>SLAT sampling steps</p>
+                    </div>
+                    <div class="parameter">
+                        <span class="parameter-name">preview_resolution</span>: int (default: 512)
+                        <p>Resolution for preview renders in pixels</p>
+                    </div>
+                    <div class="parameter">
+                        <span class="parameter-name">preview_frames</span>: int (15-1000, default: 30)
+                        <p>Number of frames in preview videos</p>
+                    </div>
+                    <div class="parameter">
+                        <span class="parameter-name">preview_fps</span>: int (default: 30)
+                        <p>Frames per second for preview videos</p>
+                    </div>
+                    <div class="parameter">
+                        <span class="parameter-name">mesh_simplify_ratio</span>: float (0-1, default: 0.95)
+                        <p>Ratio for mesh simplification. Lower values create simpler meshes</p>
+                    </div>
+                    <div class="parameter">
+                        <span class="parameter-name">texture_size</span>: int (default: 1024)
+                        <p>Size of the output texture in pixels</p>
+                    </div>
+                    <div class="parameter">
+                        <span class="parameter-name">output_format</span>: string
+                        <p>Output format, either "glb" or "gltf"</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</body>
+</html>

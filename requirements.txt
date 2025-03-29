@@ -5,31 +5,21 @@ pybind11
 diffusers
 einops
 opencv-python
-numpy
-torch
-transformers==4.49.0
-torchvision
-#taming-transformers-rom1504
-#ConfigArgParse
-#ipdb
+numpy<2.0
 omegaconf
-diso
-#sentencepiece
+
 tqdm
+transformers==4.49.0
+diso
 
 # Mesh Processing
 trimesh
 pymeshlab
 pygltflib
 xatlas
-#kornia
-#facexlib
 
 # Training
 accelerate
-#pytorch_lightning
-#scikit-learn
-#scikit-image
 
 # Demo only
 gradio
@@ -39,5 +29,3 @@ mmgp==3.2.7
 uvicorn
 rembg
 onnxruntime
-#gevent
-#geventhttpclient
