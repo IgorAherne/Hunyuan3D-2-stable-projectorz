@@ -1,28 +1,16 @@
-# Hunyuan 3D is licensed under the TENCENT HUNYUAN NON-COMMERCIAL LICENSE AGREEMENT
-# except for the third-party components listed below.
-# Hunyuan 3D does not impose any additional limitations beyond what is outlined
-# in the repsective licenses of these third-party components.
-# Users must comply with all terms and conditions of original licenses of these third-party
-# components and must ensure that the usage of the third party components adheres to
-# all relevant laws and regulations.
-
-# For avoidance of doubts, Hunyuan 3D means the large language models and
-# their software and algorithms, including trained model weights, parameters (including
-# optimizer states), machine-learning model code, inference-enabling code, training-enabling code,
-# fine-tuning enabling code and other elements of the foregoing made publicly available
-# by Tencent in accordance with TENCENT HUNYUAN COMMUNITY LICENSE AGREEMENT.
-
 from setuptools import setup, Extension
 import pybind11
 import sys
 import platform
+import sysconfig
+import os
 
 def get_platform_specific_args():
     system = platform.system().lower()
-    cpp_std = 'c++14'  # Make configurable if needed
+    cpp_std = 'c++14'
     
     if sys.platform == 'win32':
-        compile_args = ['/O2', f'/std:{cpp_std}', '/EHsc', '/MP', '/DWIN32_LEAN_AND_MEAN', '/bigobj']
+        compile_args = ['/O2', f'/std:{cpp_std}', '/EHsc', '/MP', '/DWIN32_LEAN_AND_MEAN', '/bigobj', '/D_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH']
         link_args = []
         extra_includes = []
     elif system == 'linux':
@@ -40,7 +28,14 @@ def get_platform_specific_args():
     return compile_args, link_args, extra_includes
 
 extra_compile_args, extra_link_args, platform_includes = get_platform_specific_args()
-include_dirs = [pybind11.get_include(), pybind11.get_include(user=True)]
+
+# Add Python include path explicitly
+python_include = sysconfig.get_path('include')
+include_dirs = [
+    pybind11.get_include(), 
+    pybind11.get_include(user=True),
+    python_include
+]
 include_dirs.extend(platform_includes)
 
 ext_modules = [
@@ -56,6 +51,9 @@ ext_modules = [
 
 setup(
     name="mesh_processor",
+    version="0.1.0",
+    author="Modified from Tencent Hunyuan3D",
+    description="Mesh processor for Hunyuan3D",
     ext_modules=ext_modules,
     install_requires=['pybind11>=2.6.0'],
     python_requires='>=3.6',
