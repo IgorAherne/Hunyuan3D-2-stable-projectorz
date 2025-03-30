@@ -155,8 +155,9 @@ async def _run_pipeline_generate_3d(pil_images, arg):
     """Generate 3D structure using Hunyuan3D pipeline"""
     def worker():
         try:
-            # Access pipelines from state
+            state.ensure_shape_model_on_gpu()
             pipeline = state.pipeline
+
             rembg = state.rembg
             
             # Clear CUDA cache before starting
@@ -286,6 +287,9 @@ async def _run_pipeline_generate_glb(outputs, mesh_simplify_ratio:float, texture
             # Only apply texturing if requested for this generation
             if apply_texture and hasattr(state, 'texture_pipeline') and state.texture_pipeline is not None and original_image is not None:
                 try:
+                    state.unload_shape_model()  # CRITICAL: Unload shape model to free ~6GB VRAM for texture generation
+                    state.optimize_texture_pipeline() #memory optimization
+
                     logger.info("Starting texture generation...")
                     textured_mesh = state.texture_pipeline(mesh, image=original_image)
                     mesh = textured_mesh
