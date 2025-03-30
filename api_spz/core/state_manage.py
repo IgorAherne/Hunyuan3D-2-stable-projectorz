@@ -39,7 +39,6 @@ logger = logging.getLogger("trellis")
 
 
 
-
 def apply_memory_optimized_export():
     """
     Memory-Optimized 3D Mesh Extraction Method
@@ -236,10 +235,8 @@ class HunyuanState:
             # Create a modified version with CPU device
             class CPUHunyuan3DTexGenConfig(Hunyuan3DTexGenConfig):
                 def __init__(self, light_remover_ckpt_path, multiview_ckpt_path):
-                    # Call parent init
-                    super().__init__(light_remover_ckpt_path, multiview_ckpt_path)
-                    # Override device to CPU
-                    self.device = 'cpu'
+                    super().__init__(light_remover_ckpt_path, multiview_ckpt_path) # Call parent init
+                    self.device = 'cpu' # Override device to CPU
             
             # Store original class for restoration
             original_config_class = pipelines.Hunyuan3DTexGenConfig
@@ -387,6 +384,10 @@ class HunyuanState:
         elif self._is_shape_model_on_cpu():
             logger.info("Shape generation model is on CPU, moving back to GPU")
             self._reload_shape_model()
+        # Apply optimizations if not already done
+        if not getattr(self.pipeline, '_shape_optimized', False):
+            logger.info("Applying memory optimizations to shape model")
+            self.optimize_shape_generation()
 
 
     def unload_shape_model(self):
@@ -402,6 +403,114 @@ class HunyuanState:
             # Move model to CPU instead of completely unloading
             self.pipeline.to('cpu')
             torch.cuda.empty_cache()
+
+
+    def optimize_shape_generation(self):
+        """Apply targeted memory optimizations to shape generation pipeline"""
+        if not hasattr(self, 'pipeline') or self.pipeline is None:
+            return False
+        
+        # Skip if already optimized
+        if getattr(self.pipeline, '_shape_optimized', False):
+            logger.info("Shape generation already optimized")
+            return True
+        
+        try:
+            import types
+            import functools
+            import gc
+            
+            # 1. Optimize the encode_cond method - addresses the 7.5GB → 8GB increase
+            if hasattr(self.pipeline, 'encode_cond'):
+                original_encode_cond = self.pipeline.encode_cond
+                
+                @functools.wraps(original_encode_cond)
+                def memory_efficient_encode_cond(pipeline_self, *args, **kwargs):
+                    # Clear cache before encoding condition
+                    gc.collect()
+                    torch.cuda.empty_cache()
+                    
+                    # Run original function
+                    result = original_encode_cond(*args, **kwargs)
+                    
+                    # Force cleanup of temporary tensors
+                    torch.cuda.empty_cache()
+                    return result
+                
+                self.pipeline.encode_cond = types.MethodType(memory_efficient_encode_cond, self.pipeline)
+                logger.info("Applied memory optimization to condition encoding")
+            
+            # 2. Optimize model forward pass - addresses the 8GB → 8.2GB spike
+            if hasattr(self.pipeline, 'model') and hasattr(self.pipeline.model, 'forward'):
+                original_forward = self.pipeline.model.forward
+                
+                @functools.wraps(original_forward)
+                def memory_efficient_forward(model_self, *args, **kwargs):
+                    # Clear cache before the forward pass
+                    torch.cuda.empty_cache()
+                    
+                    # Run original forward pass
+                    result = original_forward(*args, **kwargs)
+                    
+                    # Force immediate cleanup
+                    torch.cuda.empty_cache()
+                    return result
+                
+                self.pipeline.model.forward = types.MethodType(memory_efficient_forward, self.pipeline.model)
+                logger.info("Applied memory optimization to model forward pass")
+            
+            # 3. Add memory management to the diffusion loop
+            original_call = self.pipeline.__call__
+            
+            @functools.wraps(original_call)
+            def memory_efficient_call(pipeline_self, *args, **kwargs):
+                # Initial cleanup
+                gc.collect()
+                torch.cuda.empty_cache()
+                
+                # Get original callback if present
+                callback = kwargs.pop("callback", None)
+                callback_steps = kwargs.pop("callback_steps", None)
+                
+                # Create wrapper callback that cleans memory
+                if callback is not None:
+                    original_callback = callback
+                    
+                    def memory_efficient_callback(step_idx, t, outputs):
+                        result = original_callback(step_idx, t, outputs)
+                        # Clean up after callback
+                        torch.cuda.empty_cache()
+                        return result
+                    
+                    kwargs["callback"] = memory_efficient_callback
+                    kwargs["callback_steps"] = callback_steps
+                
+                # Run the pipeline with original function
+                result = original_call(*args, **kwargs)
+                
+                # Final cleanup
+                gc.collect()
+                torch.cuda.empty_cache()
+                return result
+            
+            self.pipeline.__call__ = types.MethodType(memory_efficient_call, self.pipeline)
+            logger.info("Applied memory optimization to pipeline call method")
+            
+            # Mark as optimized
+            self.pipeline._shape_optimized = True
+            
+            # Measure memory after optimization
+            if torch.cuda.is_available():
+                allocated = torch.cuda.memory_allocated() / (1024 * 1024)
+                logger.info(f"VRAM allocated after shape optimizations: {allocated:.1f}MB")
+                
+            return True
+        except Exception as e:
+            logger.error(f"Failed to apply shape generation optimizations: {str(e)}")
+            import traceback
+            logger.error(traceback.format_exc())
+            return False
+
             
             
     # Helper functions need to be defined as proper methods with self
