@@ -1,9 +1,39 @@
-import torch
+import os
+import sys
+from contextlib import contextmanager
 import logging
+import torch
 from pathlib import Path
 from hy3dgen.shapegen import Hunyuan3DDiTFlowMatchingPipeline, FloaterRemover, DegenerateFaceRemover, FaceReducer
 from hy3dgen.texgen import Hunyuan3DPaintPipeline
 from hy3dgen.rembg import BackgroundRemover
+
+
+@contextmanager
+def suppress_float16_cpu_warnings():
+    """Selectively suppress only float16/CPU compatibility warnings"""
+    import warnings
+    import logging
+    
+    # Save original state
+    diffusers_logger = logging.getLogger("diffusers")
+    original_diffusers_level = diffusers_logger.level
+    original_filters = warnings.filters.copy()
+    
+    try:
+        # Add specific warning filter for float16/CPU warnings
+        warnings.filterwarnings("ignore", 
+                               message="Pipelines loaded with `dtype=torch.float16` cannot run with `cpu` device.*")
+        
+        # Increase diffusers logger level to suppress the same warning from their side
+        diffusers_logger.setLevel(logging.ERROR)
+        
+        yield
+    finally:
+        # Restore original state
+        warnings.filters = original_filters
+        diffusers_logger.setLevel(original_diffusers_level)
+
 
 logger = logging.getLogger("trellis")
 
@@ -23,51 +53,8 @@ class HunyuanState:
             from shutil import rmtree
             rmtree(self.temp_dir)
 
-
-    def initialize_pipeline(self, 
-                            model_path='tencent/Hunyuan3D-2mini', 
-                            subfolder='hunyuan3d-dit-v2-mini-turbo',
-                            texgen_model_path='tencent/Hunyuan3D-2',
-                            device=None,
-                            enable_flashvdm=True,
-                            mc_algo='mc',
-                            low_vram_mode=False):
-        print(f"Initializing Hunyuan3D models from {model_path}/{subfolder}")
-        
-        # Store model path for reference
-        self.model_path = model_path
-        self.subfolder = subfolder
-        
-        # Determine device
-        if device is None:
-            device = "cuda" if torch.cuda.is_available() else "cpu"
-        self._device = device
-        
-        # Store config values without computation
-        self._enable_flashvdm = enable_flashvdm
-        self._mc_algo = mc_algo
-        self._low_vram_mode = low_vram_mode
-        self._texgen_model_path = texgen_model_path
-        
-        # Initialize components
-        self.rembg = BackgroundRemover()
-        
-        # Load shape model
-        self.pipeline = Hunyuan3DDiTFlowMatchingPipeline.from_pretrained(
-            model_path,
-            subfolder=subfolder,
-            use_safetensors=True,
-            device="cpu" if low_vram_mode else device,  # Start on CPU when in low VRAM mode
-        )
-        if enable_flashvdm:
-            self.pipeline.enable_flashvdm(mc_algo=mc_algo)
-        
-        # Post-processing utilities
-        self.floater_remover = FloaterRemover()
-        self.degenerate_face_remover = DegenerateFaceRemover()
-        self.face_reducer = FaceReducer()
-        
-        # ===== TEXTURE PIPELINE WITH MEMORY OPTIMIZATION =====
+    def _initialize_texture_pipeline(self, texgen_model_path, low_vram_mode=False):
+        """Initialize texture pipeline with CPU device and memory optimizations"""
         try:
             # Import the modules we need to modify
             from hy3dgen.texgen import pipelines
@@ -87,31 +74,81 @@ class HunyuanState:
             # Monkey patch with our CPU version
             pipelines.Hunyuan3DTexGenConfig = CPUHunyuan3DTexGenConfig
             
-            # Now load the pipeline - it will use our CPU config
-            self.texture_pipeline = Hunyuan3DPaintPipeline.from_pretrained(texgen_model_path)
+            # Load pipeline with selective warning suppression
+            with suppress_float16_cpu_warnings():
+                self.texture_pipeline = Hunyuan3DPaintPipeline.from_pretrained(texgen_model_path)
             
             # Restore the original class
             pipelines.Hunyuan3DTexGenConfig = original_config_class
             
-            # Now we can safely enable model CPU offloading which selectively moves
-            # only necessary components to GPU
+            # Apply CPU offloading for selective GPU usage
             if low_vram_mode and hasattr(self.texture_pipeline, 'enable_model_cpu_offload'):
                 self.texture_pipeline.enable_model_cpu_offload()
+                logger.info("Texture pipeline loaded with CPU offloading (low VRAM mode)")
                 print("Texture pipeline loaded with CPU offloading (low VRAM mode)")
             else:
+                logger.info("Texture pipeline loaded successfully")
                 print("Texture pipeline loaded successfully")
-                
+            return True
         except Exception as e:
             # Ensure we restore the original class in case of error
             if 'original_config_class' in locals():
                 pipelines.Hunyuan3DTexGenConfig = original_config_class
                 
+            logger.error(f"Failed to load texture pipeline: {e}")
             print(f"Failed to load texture pipeline: {e}")
             self.texture_pipeline = None
+            return False
+        
+        
+    def initialize_pipeline(self, 
+                           model_path='tencent/Hunyuan3D-2mini', 
+                           subfolder='hunyuan3d-dit-v2-mini-turbo',
+                           texgen_model_path='tencent/Hunyuan3D-2',
+                           device=None,
+                           enable_flashvdm=True,
+                           mc_algo='mc',
+                           low_vram_mode=False):
+        print(f"Initializing Hunyuan3D models from {model_path}/{subfolder}")
+        
+        # Store model path for reference
+        self.model_path = model_path
+        self.subfolder = subfolder
+        
+        # Determine device
+        if device is None:
+            device = "cuda" if torch.cuda.is_available() else "cpu"
+        self._device = device
+        
+        # Store config values without computation
+        self._enable_flashvdm = enable_flashvdm
+        self._mc_algo = mc_algo
+        self._low_vram_mode = low_vram_mode
+        self._texgen_model_path = texgen_model_path
+        # Initialize components
+        self.rembg = BackgroundRemover()
+        # Load shape model
+        self.pipeline = Hunyuan3DDiTFlowMatchingPipeline.from_pretrained(
+            model_path,
+            subfolder=subfolder,
+            use_safetensors=True,
+            device="cpu" if low_vram_mode else device,  # Start on CPU when in low VRAM mode
+        )
+        if enable_flashvdm:
+            self.pipeline.enable_flashvdm(mc_algo=mc_algo)
+        
+        # Post-processing utilities
+        self.floater_remover = FloaterRemover()
+        self.degenerate_face_remover = DegenerateFaceRemover()
+        self.face_reducer = FaceReducer()
+        
+        # Initialize texture pipeline with extracted method
+        self._initialize_texture_pipeline(texgen_model_path, low_vram_mode)
         
         # Basic memory logging
         if torch.cuda.is_available():
             allocated = torch.cuda.memory_allocated() / (1024 * 1024)
+            logger.info(f"VRAM allocated at startup: {allocated:.1f}MB")
             print(f"VRAM allocated at startup: {allocated:.1f}MB")
 
 
