@@ -23,6 +23,7 @@ class HunyuanState:
             from shutil import rmtree
             rmtree(self.temp_dir)
 
+
     def initialize_pipeline(self, 
                             model_path='tencent/Hunyuan3D-2mini', 
                             subfolder='hunyuan3d-dit-v2-mini-turbo',
@@ -37,12 +38,12 @@ class HunyuanState:
         self.model_path = model_path
         self.subfolder = subfolder
         
-        # Determine device and store it as class attribute
+        # Determine device
         if device is None:
             device = "cuda" if torch.cuda.is_available() else "cpu"
-        self._device = device  # Store explicitly as class attribute
+        self._device = device
         
-        # Save these settings for potential reloading
+        # Store config values without computation
         self._enable_flashvdm = enable_flashvdm
         self._mc_algo = mc_algo
         self._low_vram_mode = low_vram_mode
@@ -51,11 +52,12 @@ class HunyuanState:
         # Initialize components
         self.rembg = BackgroundRemover()
         
+        # Load shape model
         self.pipeline = Hunyuan3DDiTFlowMatchingPipeline.from_pretrained(
             model_path,
             subfolder=subfolder,
             use_safetensors=True,
-            device=device,
+            device="cpu" if low_vram_mode else device,  # Start on CPU when in low VRAM mode
         )
         if enable_flashvdm:
             self.pipeline.enable_flashvdm(mc_algo=mc_algo)
@@ -65,29 +67,52 @@ class HunyuanState:
         self.degenerate_face_remover = DegenerateFaceRemover()
         self.face_reducer = FaceReducer()
         
-        # Always try to load texture pipeline, but with CPU offloading in low VRAM mode
+        # ===== TEXTURE PIPELINE WITH MEMORY OPTIMIZATION =====
         try:
+            # Import the modules we need to modify
+            from hy3dgen.texgen import pipelines
+            from hy3dgen.texgen.pipelines import Hunyuan3DTexGenConfig
+            
+            # Create a modified version with CPU device
+            class CPUHunyuan3DTexGenConfig(Hunyuan3DTexGenConfig):
+                def __init__(self, light_remover_ckpt_path, multiview_ckpt_path):
+                    # Call parent init
+                    super().__init__(light_remover_ckpt_path, multiview_ckpt_path)
+                    # Override device to CPU
+                    self.device = 'cpu'
+            
+            # Store original class for restoration
+            original_config_class = pipelines.Hunyuan3DTexGenConfig
+            
+            # Monkey patch with our CPU version
+            pipelines.Hunyuan3DTexGenConfig = CPUHunyuan3DTexGenConfig
+            
+            # Now load the pipeline - it will use our CPU config
             self.texture_pipeline = Hunyuan3DPaintPipeline.from_pretrained(texgen_model_path)
-            if low_vram_mode:
+            
+            # Restore the original class
+            pipelines.Hunyuan3DTexGenConfig = original_config_class
+            
+            # Now we can safely enable model CPU offloading which selectively moves
+            # only necessary components to GPU
+            if low_vram_mode and hasattr(self.texture_pipeline, 'enable_model_cpu_offload'):
                 self.texture_pipeline.enable_model_cpu_offload()
                 print("Texture pipeline loaded with CPU offloading (low VRAM mode)")
             else:
                 print("Texture pipeline loaded successfully")
+                
         except Exception as e:
+            # Ensure we restore the original class in case of error
+            if 'original_config_class' in locals():
+                pipelines.Hunyuan3DTexGenConfig = original_config_class
+                
             print(f"Failed to load texture pipeline: {e}")
             self.texture_pipeline = None
-            
-        # Log memory usage after initialization
-        self.log_memory_usage("after initialization")
-
-
-    def log_memory_usage(self, label=""):
-        """Log current VRAM usage"""
+        
+        # Basic memory logging
         if torch.cuda.is_available():
             allocated = torch.cuda.memory_allocated() / (1024 * 1024)
-            reserved = torch.cuda.memory_reserved() / (1024 * 1024)
-            max_allocated = torch.cuda.max_memory_allocated() / (1024 * 1024)
-            logger.info(f"VRAM {label}: allocated={allocated:.1f}MB, reserved={reserved:.1f}MB, peak={max_allocated:.1f}MB")
+            print(f"VRAM allocated at startup: {allocated:.1f}MB")
 
 
     def _is_shape_model_on_cpu(self):
@@ -122,7 +147,6 @@ class HunyuanState:
                 self.pipeline.to(device)
                 
                 logger.info(f"Shape generation model moved to {device}")
-                self.log_memory_usage("after moving shape model to GPU")
         else:
             # Fall back to full reload if model was completely unloaded
             logger.info("Shape model was fully unloaded, performing full reload")
@@ -162,18 +186,15 @@ class HunyuanState:
                 self._shape_model_device = self.pipeline.device
             else:
                 self._shape_model_device = "cuda" if torch.cuda.is_available() else "cpu"
-            
             # Move model to CPU instead of completely unloading
             self.pipeline.to('cpu')
-            
             torch.cuda.empty_cache()
-            self.log_memory_usage("after moving shape model to CPU")
-
+            
             
     # Helper functions need to be defined as proper methods with self
     @staticmethod
     @torch.no_grad()
-    def _chunked_vae_decode(original_fn, latents, chunk_size=2, *args, **kwargs):
+    def _chunked_vae_decode(original_fn, latents, chunk_size=3, *args, **kwargs):
         """Memory-efficient VAE decoding that processes in chunks."""
         logger.info("Using chunked VAE decoding")
         
@@ -219,6 +240,7 @@ class HunyuanState:
             # For single tensor returns
             return torch.cat(results)
 
+
     @staticmethod
     @torch.no_grad()
     def _chunked_encode_images(original_fn, images, chunk_size=2):
@@ -245,19 +267,18 @@ class HunyuanState:
             # Encode chunk
             chunk_result = original_fn(chunk)
             results.append(chunk_result)
-            
             # Clear cache
             torch.cuda.empty_cache()
         
         # Combine results
         return torch.cat(results)
 
-    def optimize_texture_pipeline(self, chunk_size=2):
+    def optimize_texture_pipeline(self, chunk_size=3):
         """Ultra-high quality memory optimization for texture pipeline with adjustable chunk size.
         
         Args:
             chunk_size: Number of items to process at once. Higher values = faster but more memory.
-                      Default is 2 which balances speed and memory usage.
+                      Default is 3 which balances speed and memory usage.
         """
         if not hasattr(self, 'texture_pipeline') or self.texture_pipeline is None:
             return
