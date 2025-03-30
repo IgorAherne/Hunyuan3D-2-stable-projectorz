@@ -1,8 +1,13 @@
 vgroup padl=4 padr=4 spacing=8 flexibleWidth=1
     go minHeight=120 preferredHeight=120 flexibleWidth=1
        
+
     single_multi_img_input  code_name=(single_multi_img_input)  visible_name=(single_multi_img_input)  content_min_num_needed=(make_meshes_and_tex:1, retexture:0 )
+
+    header visible_name=(Hunyuan multi-view supports up to 6 sides) color=(33,33,33,255)
     
+    space minHeight=5
+
     go minHeight=140 preferredHeight=140 flexibleWidth=1
         hgroup spacing=8
             hgroup bg.color=(255,255,255,10) bg.ppu=10 flexibleWidth=1
@@ -17,7 +22,7 @@ vgroup padl=4 padr=4 spacing=8 flexibleWidth=1
                 slider  code_name=(octree_resolution)  visible_name=(octree\nresolution)  min=128  max=512  default=256  show_n_decimals=0  flexibleHeight=1
                 space  minWidth=20  preferredWidth=30  flexibleHeight=1
                 slider  code_name=(num_chunks)  visible_name=(num\nchunks)  min=1  max=200  default=80  show_n_decimals=0  flexibleHeight=1
-                space  minWidth=20  flexibleHeight=1  flexibleWidth=1
+                space  minWidth=20  flexibleHeight=1  flexibleWidth=1       
     
     go minHeight=140 preferredHeight=140 flexibleWidth=1
         hgroup spacing=8 
