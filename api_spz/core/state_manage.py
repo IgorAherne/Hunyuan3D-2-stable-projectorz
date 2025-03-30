@@ -1,5 +1,3 @@
-import os
-import sys
 from contextlib import contextmanager
 import logging
 import torch
@@ -8,6 +6,8 @@ from hy3dgen.shapegen import Hunyuan3DDiTFlowMatchingPipeline, FloaterRemover, D
 from hy3dgen.texgen import Hunyuan3DPaintPipeline
 from hy3dgen.rembg import BackgroundRemover
 
+
+logger = logging.getLogger("trellis")
 
 @contextmanager
 def suppress_float16_cpu_warnings():
@@ -33,10 +33,6 @@ def suppress_float16_cpu_warnings():
         # Restore original state
         warnings.filters = original_filters
         diffusers_logger.setLevel(original_diffusers_level)
-
-
-logger = logging.getLogger("trellis")
-
 
 
 
@@ -308,6 +304,7 @@ class HunyuanState:
             use_safetensors=True,
             device="cpu" if low_vram_mode else device,  # Start on CPU when in low VRAM mode
         )
+        
         if enable_flashvdm:
             self.pipeline.enable_flashvdm(mc_algo=mc_algo)
         
