@@ -311,7 +311,7 @@ class HunyuanState:
         return torch.cat(results)
 
     def optimize_texture_pipeline(self, chunk_size=3):
-        """Ultra-high quality memory optimization for texture pipeline with adjustable chunk size.
+        """memory optimization for texture pipeline with adjustable chunk size.
         
         Args:
             chunk_size: Number of items to process at once. Higher values = faster but more memory.
@@ -325,7 +325,7 @@ class HunyuanState:
             logger.info("Optimization already applied - skipping")
             return
             
-        logger.info(f"Applying ultra-high quality memory optimization (chunk size: {chunk_size})")
+        logger.info(f"Applying memory optimization (chunk size: {chunk_size})")
         
         # Access the multiview model
         if 'multiview_model' not in self.texture_pipeline.models:
@@ -369,7 +369,7 @@ class HunyuanState:
         # Mark as optimized
         self.texture_pipeline._memory_optimized_marker = True
         
-        logger.info("Ultra-high quality memory optimization applied")
+        logger.info("Texture memory optimization applied")
 
 # Global state instance
 state = HunyuanState()
