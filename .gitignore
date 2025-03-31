@@ -51,6 +51,8 @@ coverage.xml
 .pytest_cache/
 cover/
 
+hunyuan_init_done.txt
+
 # Translations
 *.mo
 *.pot

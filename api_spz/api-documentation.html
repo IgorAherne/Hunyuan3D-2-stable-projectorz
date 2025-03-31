@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Generation API Documentation</title>
+    <title>Hunyuan3D API Documentation</title>
     <style>
         :root {
             --primary-color: #c4b5fd;
@@ -198,24 +198,25 @@
         }
     </style>
 </head>
+<body>
 <div class="container">
-        <h1>3D Generation API Documentation</h1>
+        <h1>Hunyuan3D Generation API Documentation</h1>
         
-		<div class="endpoint" style="margin-top: -1rem; margin-bottom: 2rem;">
-			<p style="color: var(--description-color);">
-				<strong style="color: var(--primary-color);">Last Updated:</strong> January 4, 2025
-			</p>
-		</div>
+        <div class="endpoint" style="margin-top: -1rem; margin-bottom: 2rem;">
+            <p style="color: var(--description-color);">
+                <strong style="color: var(--primary-color);">Last Updated:</strong> March 31, 2025
+            </p>
+        </div>
 
         <section id="workflow">
             <h2>Generation Workflows</h2>
 
             <div class="endpoint">
                 <h3>Single Image Workflow</h3>
-                <p class="description">There are two possible flows when generating from a single image:</p>
+                <p class="description">Direct generation from a single image:</p>
                 
                 <div class="workflow-option">
-                    <h4>Option 1: Direct Generation (No Preview)</h4>
+                    <h4>Using the API directly</h4>
                     <ol>
                         <li>POST to <code>/generate_no_preview</code> with your base64 image and parameters</li>
                         <li>Poll <code>/status</code> until completion</li>
@@ -224,12 +225,9 @@
                 </div>
 
                 <div class="workflow-option">
-                    <h4>Option 2: With Preview</h4>
+                    <h4>Using the simplified UI endpoint</h4>
                     <ol>
-                        <li>POST to <code>/generate_preview</code> with your base64 image and parameters</li>
-                        <li>Poll <code>/status</code> until preview is ready</li>
-                        <li>GET <code>/download/preview/{type}</code> to view the previews</li>
-                        <li>If satisfied, POST to <code>/resume_from_preview</code></li>
+                        <li>POST to <code>/generate</code> with your base64 image and simplified parameters</li>
                         <li>Poll <code>/status</code> until completion</li>
                         <li>GET <code>/download/model</code> to obtain the final GLB</li>
                     </ol>
@@ -238,30 +236,30 @@
 
             <div class="endpoint">
                 <h3>Multi-Image Workflow</h3>
-                <p class="description">Similarly, there are two flows for multi-image generation:</p>
+                <p class="description">Direct generation from multiple images:</p>
                 
                 <div class="workflow-option">
-                    <h4>Option 1: Direct Generation (No Preview)</h4>
+                    <h4>Using multiple images (recommended for multiview models)</h4>
                     <ol>
                         <li>POST to <code>/generate_multi_no_preview</code> with your base64 images and parameters</li>
-                        <li>Poll <code>/status</code> until completion</li>
-                        <li>GET <code>/download/model</code> to obtain the final GLB</li>
-                    </ol>
-                </div>
-
-                <div class="workflow-option">
-                    <h4>Option 2: With Preview</h4>
-                    <ol>
-                        <li>POST to <code>/generate_multi_preview</code> with your base64 images and parameters</li>
-                        <li>Poll <code>/status</code> until preview is ready</li>
-                        <li>GET <code>/download/preview/{type}</code> to view the previews</li>
-                        <li>If satisfied, POST to <code>/resume_from_preview</code></li>
+                        <li>For best results with mv models, provide front/side/back views when possible</li>
+                        <li>The system automatically uses front view if only one image is provided</li>
                         <li>Poll <code>/status</code> until completion</li>
                         <li>GET <code>/download/model</code> to obtain the final GLB</li>
                     </ol>
                 </div>
             </div>
         </section>
+        
+        <nav class="top-nav">
+            <ul class="nav-list">
+                <li><a href="#workflow">Workflows</a></li>
+                <li><a href="#examples">Code Examples</a></li>
+                <li><a href="#status-endpoints">Status Endpoints</a></li>
+                <li><a href="#generation-endpoints">Generation Endpoints</a></li>
+                <li><a href="#download-endpoints">Download Endpoints</a></li>
+            </ul>
+        </nav>
         
         <section id="examples">
             <h2>Code Examples</h2>
@@ -275,23 +273,27 @@ import time
 # API endpoint
 BASE_URL = "http://127.0.0.1:7960"
 
-def generate_no_preview(image_base64: str):
-    """Generate 3D model from a single base64-encoded image without previews.
+def generate_from_image(image_path: str):
+    """Generate 3D model from a single image.
     
     Args:
-        image_base64: Base64 string of the image (without 'data:image/...' prefix)
+        image_path: Path to the image file
     """
     try:
+        # Convert image to base64
+        with open(image_path, "rb") as img_file:
+            image_base64 = base64.b64encode(img_file.read()).decode('utf-8')
+        
         # Set generation parameters
         params = {
             'image_base64': image_base64,
             'seed': 42,
-            'ss_guidance_strength': 7.5,
-            'ss_sampling_steps': 30,
-            'slat_guidance_strength': 7.5,
-            'slat_sampling_steps': 30,
-            'mesh_simplify_ratio': 0.95,
-            'texture_size': 1024,
+            'guidance_scale': 5.0,
+            'num_inference_steps': 20,
+            'octree_resolution': 256,
+            'num_chunks': 80,
+            'mesh_simplify_ratio': 0.1,
+            'apply_texture': True,
             'output_format': 'glb'
         }
         
@@ -317,7 +319,11 @@ def generate_no_preview(image_base64: str):
         response = requests.get(f"{BASE_URL}/download/model")
         response.raise_for_status()
         
-        return response.content
+        # Save the model
+        with open("output_model.glb", "wb") as f:
+            f.write(response.content)
+        
+        print("Model saved as output_model.glb")
         
     except Exception as e:
         print(f"Error: {str(e)}")
@@ -326,61 +332,38 @@ def generate_no_preview(image_base64: str):
 
             <div class="endpoint">
                 <h3>Multi-Image Generation (Python)</h3>
-                <pre><code>def generate_multi_preview(image_base64_list: list[str]):
-    """Generate 3D model from multiple base64-encoded images with previews.
+                <pre><code>def generate_from_multiple_images(image_paths: list):
+    """Generate 3D model from multiple images using multi-view model.
     
     Args:
-        image_base64_list: List of base64 strings (without 'data:image/...' prefix)
+        image_paths: List of paths to image files
     """
     try:
+        # Convert images to base64
+        image_base64_list = []
+        for path in image_paths:
+            with open(path, "rb") as img_file:
+                image_base64_list.append(base64.b64encode(img_file.read()).decode('utf-8'))
+        
         # Set generation parameters
         params = {
             'image_list_base64': image_base64_list,
             'seed': 42,
-            'ss_guidance_strength': 7.5,
-            'ss_sampling_steps': 30,
-            'slat_guidance_strength': 7.5,
-            'slat_sampling_steps': 30,
-            'preview_resolution': 512,
-            'preview_frames': 30,
-            'preview_fps': 30,
-            'mesh_simplify_ratio': 0.95,
-            'texture_size': 1024,
+            'guidance_scale': 5.0,
+            'num_inference_steps': 20,
+            'octree_resolution': 256,
+            'num_chunks': 80,
+            'mesh_simplify_ratio': 0.1,
+            'apply_texture': True,
             'output_format': 'glb'
         }
         
-        # Start generation with preview
-        print("Starting generation...")
-        response = requests.post(f"{BASE_URL}/generate_multi_preview", data=params)
+        # Start generation
+        print("Starting multi-view generation...")
+        response = requests.post(f"{BASE_URL}/generate_multi_no_preview", data=params)
         response.raise_for_status()
         
-        # Poll until preview is ready
-        while True:
-            status = requests.get(f"{BASE_URL}/status").json()
-            print(f"Progress: {status['progress']}%")
-            
-            if status['status'] == 'PREVIEW_READY':
-                break
-            elif status['status'] == 'FAILED':
-                raise Exception(f"Generation failed: {status['message']}")
-            
-            time.sleep(1)
-        
-        # Download preview video
-        print("Downloading preview...")
-        preview = requests.get(f"{BASE_URL}/download/preview/gaussian")
-        preview.raise_for_status()
-        
-        # Resume generation to get final model
-        print("Resuming generation for final model...")
-        resume_params = {
-            'mesh_simplify_ratio': 0.95,
-            'texture_size': 1024
-        }
-        response = requests.post(f"{BASE_URL}/resume_from_preview", params=resume_params)
-        response.raise_for_status()
-        
-        # Wait for final model
+        # Poll status until complete
         while True:
             status = requests.get(f"{BASE_URL}/status").json()
             print(f"Progress: {status['progress']}%")
@@ -388,36 +371,26 @@ def generate_no_preview(image_base64: str):
             if status['status'] == 'COMPLETE':
                 break
             elif status['status'] == 'FAILED':
-                raise Exception(f"Final generation failed: {status['message']}")
+                raise Exception(f"Generation failed: {status['message']}")
             
             time.sleep(1)
         
         # Download final model
-        print("Downloading final model...")
+        print("Downloading model...")
         model = requests.get(f"{BASE_URL}/download/model")
         model.raise_for_status()
         
-        return {
-            'preview': preview.content,
-            'model': model.content
-        }
+        # Save the model
+        with open("output_model.glb", "wb") as f:
+            f.write(model.content)
+        
+        print("Model saved as output_model.glb")
         
     except Exception as e:
         print(f"Error: {str(e)}")
         return None</code></pre>
             </div>
         </section>
-        
-        <nav class="top-nav">
-            <ul class="nav-list">
-                <li><a href="#workflow">Workflows</a></li>
-                <li><a href="#examples">Code Examples</a></li>
-                <li><a href="#status-endpoints">Status Endpoints</a></li>
-                <li><a href="#generation-endpoints">Generation Endpoints</a></li>
-                <li><a href="#preview-endpoints">Preview Endpoints</a></li>
-                <li><a href="#download-endpoints">Download Endpoints</a></li>
-            </ul>
-        </nav>
 
         <section id="status-endpoints">
             <h2>Status Endpoints</h2>
@@ -430,7 +403,7 @@ def generate_no_preview(image_base64: str):
                     <strong>Response:</strong>
                     <pre><code>{
     "status": "running",
-    "message": "Trellis API is operational",
+    "message": "API is operational",
     "busy": boolean
 }</code></pre>
                 </div>
@@ -443,8 +416,8 @@ def generate_no_preview(image_base64: str):
                 <div class="response">
                     <strong>Response:</strong>
                     <pre><code>{
-    "status": string,
-    "progress": number,
+    "status": string,  // "PROCESSING", "COMPLETE", "FAILED"
+    "progress": number,  // 0-100
     "message": string,
     "busy": boolean
 }</code></pre>
@@ -457,26 +430,86 @@ def generate_no_preview(image_base64: str):
             
             <div class="endpoint">
                 <span class="method post">POST</span>
-                <span class="endpoint-path">/generate_no_preview</span>
-                <p class="description">Generate a 3D model without previews. Download GLB when complete.</p>
+                <span class="endpoint-path">/generate</span>
+                <p class="description">Simplified endpoint for UI integration. Generate a 3D model from a single or multiple images.</p>
                 <div class="parameters">
                     <strong>Parameters:</strong>
                     <div class="parameter">
-                        <span class="parameter-name">image_base64</span>: string (required)
-                        <p>Base64-encoded image data (without 'data:image/...' prefix)</p>
+                        <span class="parameter-name">single_multi_img_input</span>: list[string] (required)
+                        <p>List of base64-encoded images</p>
+                    </div>
+                    <div class="parameter">
+                        <span class="parameter-name">seed</span>: int (default: 1234)
+                        <p>Random seed for generation</p>
+                    </div>
+                    <div class="parameter">
+                        <span class="parameter-name">guidance_scale</span>: float (default: 5.0)
+                        <p>Guidance scale for generation</p>
+                    </div>
+                    <div class="parameter">
+                        <span class="parameter-name">num_inference_steps</span>: int (default: 20)
+                        <p>Number of inference steps</p>
+                    </div>
+                    <div class="parameter">
+                        <span class="parameter-name">octree_resolution</span>: int (default: 256)
+                        <p>Resolution of the octree for mesh extraction</p>
+                    </div>
+                    <div class="parameter">
+                        <span class="parameter-name">num_chunks</span>: int (default: 80)
+                        <p>Number of chunks for mesh extraction (internally multiplied by 1000)</p>
+                    </div>
+                    <div class="parameter">
+                        <span class="parameter-name">mesh_simplify</span>: float (default: 0.1)
+                        <p>Ratio for mesh simplification (0-1 or 0-100)</p>
+                    </div>
+                    <div class="parameter">
+                        <span class="parameter-name">apply_texture</span>: boolean (default: false)
+                        <p>Whether to apply texture to the model</p>
                     </div>
                 </div>
             </div>
-
+            
             <div class="endpoint">
                 <span class="method post">POST</span>
-                <span class="endpoint-path">/generate_preview</span>
-                <p class="description">Generate a 3D structure with previews. Download videos when ready.</p>
+                <span class="endpoint-path">/generate_no_preview</span>
+                <p class="description">Generate a 3D model from a single image. Download GLB when complete.</p>
                 <div class="parameters">
                     <strong>Parameters:</strong>
                     <div class="parameter">
-                        <span class="parameter-name">image_base64</span>: string (required)
-                        <p>Base64-encoded image data (without 'data:image/...' prefix)</p>
+                        <span class="parameter-name">file</span>: file or <span class="parameter-name">image_base64</span>: string
+                        <p>Image file upload or base64-encoded image data</p>
+                    </div>
+                    <div class="parameter">
+                        <span class="parameter-name">seed</span>: int (default: 1234)
+                        <p>Random seed for generation</p>
+                    </div>
+                    <div class="parameter">
+                        <span class="parameter-name">guidance_scale</span>: float (default: 5.0)
+                        <p>Guidance scale for generation</p>
+                    </div>
+                    <div class="parameter">
+                        <span class="parameter-name">num_inference_steps</span>: int (default: 20)
+                        <p>Number of inference steps</p>
+                    </div>
+                    <div class="parameter">
+                        <span class="parameter-name">octree_resolution</span>: int (default: 256)
+                        <p>Resolution of the octree for mesh extraction</p>
+                    </div>
+                    <div class="parameter">
+                        <span class="parameter-name">num_chunks</span>: int (default: 80)
+                        <p>Number of chunks for mesh extraction (internally multiplied by 1000)</p>
+                    </div>
+                    <div class="parameter">
+                        <span class="parameter-name">mesh_simplify_ratio</span>: float (default: 0.1)
+                        <p>Ratio for mesh simplification (0-1 or 0-100)</p>
+                    </div>
+                    <div class="parameter">
+                        <span class="parameter-name">apply_texture</span>: boolean (default: false)
+                        <p>Whether to apply texture to the model</p>
+                    </div>
+                    <div class="parameter">
+                        <span class="parameter-name">output_format</span>: string (default: "glb")
+                        <p>Output format (glb or obj)</p>
                     </div>
                 </div>
             </div>
@@ -484,54 +517,51 @@ def generate_no_preview(image_base64: str):
             <div class="endpoint">
                 <span class="method post">POST</span>
                 <span class="endpoint-path">/generate_multi_no_preview</span>
-                <p class="description">Generate a 3D model using multiple images without previews.</p>
+                <p class="description">Generate a 3D model using multiple images. Best used with multiview models.</p>
                 <div class="parameters">
                     <strong>Parameters:</strong>
                     <div class="parameter">
-                        <span class="parameter-name">image_list_base64</span>: list[string] (required)
-                        <p>List of base64-encoded images (without 'data:image/...' prefix)</p>
+                        <span class="parameter-name">file_list</span>: list[file] or <span class="parameter-name">image_list_base64</span>: list[string]
+                        <p>List of image file uploads or list of base64-encoded images</p>
                     </div>
-                </div>
-            </div>
-
-            <div class="endpoint">
-                <span class="method post">POST</span>
-                <span class="endpoint-path">/generate_multi_preview</span>
-                <p class="description">Generate previews using multiple images.</p>
-                <div class="parameters">
-                    <strong>Parameters:</strong>
-                    <div class="parameter">
-                        <span class="parameter-name">image_list_base64</span>: list[string] (required)
-                        <p>List of base64-encoded images (without 'data:image/...' prefix)</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="endpoint">
-                <span class="method post">POST</span>
-                <span class="endpoint-path">/resume_from_preview</span>
-                <p class="description">Continue generation from a preview-ready state to create the final GLB model.</p>
-                <div class="parameters">
-                    <strong>Parameters:</strong>
-                    <div class="parameter">
-                        <span class="parameter-name">mesh_simplify_ratio</span>: float (0-1, default: 0.95)
-                        <p>Ratio for mesh simplification</p>
-                    </div>
-                    <div class="parameter">
-                        <span class="parameter-name">texture_size</span>: int (0-4096, default: 1024)
-                        <p>Size of the output texture</p>
-                    </div>
+                    <!-- Other parameters are the same as above -->
                 </div>
             </div>
         </section>
 
-        <section id="preview-endpoints">
-            <h2>Preview Control</h2>
+        <section id="control-endpoints">
+            <h2>Control Endpoints</h2>
             
             <div class="endpoint">
                 <span class="method post">POST</span>
                 <span class="endpoint-path">/interrupt</span>
                 <p class="description">Cancel the current generation process.</p>
+                <div class="response">
+                    <strong>Response:</strong>
+                    <pre><code>{
+    "status": "interrupt_requested" // or "no_generation_in_progress"
+}</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <section id="info-endpoints">
+            <h2>Information Endpoints</h2>
+            
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="endpoint-path">/info/supported_operations</span>
+                <p class="description">Get a list of supported operations.</p>
+                <div class="response">
+                    <strong>Response:</strong>
+                    <pre><code>["make_meshes_and_tex"]</code></pre>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="endpoint-path">/download/spz-ui-layout/generation-3d-panel</span>
+                <p class="description">Get the UI layout for StableProjectorz integration.</p>
             </div>
         </section>
 
@@ -540,64 +570,46 @@ def generate_no_preview(image_base64: str):
             
             <div class="endpoint">
                 <span class="method get">GET</span>
-                <span class="endpoint-path">/download/preview/{type}</span>
-                <p class="description">Download preview video. Type can be: "gaussian" or "mesh".</p>
-            </div>
-
-            <div class="endpoint">
-                <span class="method get">GET</span>
                 <span class="endpoint-path">/download/model</span>
-                <p class="description">Download the final 3D model (GLB format, with texture).</p>
+                <p class="description">Download the final 3D model (GLB format, with texture if requested).</p>
             </div>
         </section>
 
-        <section id="common-parameters">
-            <h2>Common Generation Parameters</h2>
+        <section id="parameter-details">
+            <h2>Parameter Details</h2>
             <div class="endpoint">
                 <div class="parameters">
                     <div class="parameter">
-                        <span class="parameter-name">seed</span>: int
-                        <p>Random seed for generation</p>
+                        <span class="parameter-name">seed</span>: int (default: 1234)
+                        <p>Random seed for reproducible generation</p>
                     </div>
                     <div class="parameter">
-                        <span class="parameter-name">ss_guidance_strength</span>: float (0-10)
-                        <p>Structure sampling guidance strength</p>
+                        <span class="parameter-name">guidance_scale</span>: float (0-10, default: 5.0)
+                        <p>Controls how closely the model follows the input image. Higher values produce more faithful results but may be less creative.</p>
                     </div>
                     <div class="parameter">
-                        <span class="parameter-name">ss_sampling_steps</span>: int (0-50)
-                        <p>Structure sampling steps</p>
+                        <span class="parameter-name">num_inference_steps</span>: int (1-50, default: 20)
+                        <p>Number of denoising steps. More steps generally produce better quality but take longer.</p>
                     </div>
                     <div class="parameter">
-                        <span class="parameter-name">slat_guidance_strength</span>: float (0-10)
-                        <p>SLAT guidance strength</p>
+                        <span class="parameter-name">octree_resolution</span>: int (128-512, default: 256)
+                        <p>Resolution of the octree for mesh extraction. Higher values produce more detailed meshes but require more VRAM.</p>
                     </div>
                     <div class="parameter">
-                        <span class="parameter-name">slat_sampling_steps</span>: int (0-50)
-                        <p>SLAT sampling steps</p>
+                        <span class="parameter-name">num_chunks</span>: int (1-200, default: 80)
+                        <p>Number of chunks for mesh extraction (internally multiplied by 1000). Higher values use less VRAM but take longer.</p>
                     </div>
                     <div class="parameter">
-                        <span class="parameter-name">preview_resolution</span>: int (default: 512)
-                        <p>Resolution for preview renders in pixels</p>
+                        <span class="parameter-name">mesh_simplify_ratio</span>: float (0-1 or 0-100, default: 0.1)
+                        <p>Ratio for mesh simplification. Lower values create simpler meshes with fewer polygons.</p>
                     </div>
                     <div class="parameter">
-                        <span class="parameter-name">preview_frames</span>: int (15-1000, default: 30)
-                        <p>Number of frames in preview videos</p>
+                        <span class="parameter-name">apply_texture</span>: boolean (default: false)
+                        <p>Whether to apply texture to the model. When true, texture generation will be performed after mesh creation.</p>
                     </div>
                     <div class="parameter">
-                        <span class="parameter-name">preview_fps</span>: int (default: 30)
-                        <p>Frames per second for preview videos</p>
-                    </div>
-                    <div class="parameter">
-                        <span class="parameter-name">mesh_simplify_ratio</span>: float (0-1, default: 0.95)
-                        <p>Ratio for mesh simplification. Lower values create simpler meshes</p>
-                    </div>
-                    <div class="parameter">
-                        <span class="parameter-name">texture_size</span>: int (default: 1024)
-                        <p>Size of the output texture in pixels</p>
-                    </div>
-                    <div class="parameter">
-                        <span class="parameter-name">output_format</span>: string
-                        <p>Output format, either "glb" or "gltf"</p>
+                        <span class="parameter-name">output_format</span>: string (default: "glb")
+                        <p>Output format. Currently supports "glb" or "obj".</p>
                     </div>
                 </div>
             </div>
