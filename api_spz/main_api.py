@@ -55,18 +55,19 @@ print(
 parser = argparse.ArgumentParser(description="Run Hunyuan3D-StableProjectorz API server")
 parser.add_argument("--host", type=str, default="127.0.0.1", help="Host to bind the server to")
 parser.add_argument("--port", type=int, default=7960, help="Port to bind the server to")
-parser.add_argument("--model-path", type=str, default="tencent/Hunyuan3D-2mini", help="Hunyuan3D model path")
+parser.add_argument("--model_path", type=str, default="tencent/Hunyuan3D-2mini", help="Hunyuan3D model path")
 parser.add_argument("--subfolder", type=str, default="hunyuan3d-dit-v2-mini-turbo", help="Model subfolder")
-parser.add_argument("--texgen-model-path", type=str, default="tencent/Hunyuan3D-2", help="Texture model path")
+parser.add_argument("--texgen_model_path", type=str, default="tencent/Hunyuan3D-2", help="Texture model path")
 parser.add_argument("--device", type=str, default=None, help="Device to use (cuda or cpu)")
-parser.add_argument("--disable-flashvdm", action="store_true", help="Disable FlashVDM acceleration")
-parser.add_argument("--low-vram-mode", action="store_true", help="Enable low VRAM mode with CPU offloading")
+parser.add_argument("--enable_flashvdm", action="store_true", help="Enable FlashVDM acceleration")
+parser.add_argument("--low_vram_mode", action="store_true", help="Enable low VRAM mode with CPU offloading")
 
 args = parser.parse_args()
 
 # Print startup information
 print("\n" + "="*50)
 print("Hunyuan3D-StableProjectorz API Server is starting up:")
+print("If it's the first time, neural nets will download. Next runs will be faster.")
 print("Touching this window will pause it. If it happens, click inside it and press 'Enter' to unpause")
 print("="*50 + "\n")
 
@@ -80,7 +81,7 @@ async def lifespan(app: FastAPI):
         subfolder=args.subfolder,
         texgen_model_path=args.texgen_model_path,
         device=device,
-        enable_flashvdm=not args.disable_flashvdm,
+        enable_flashvdm=args.enable_flashvdm,
         low_vram_mode=args.low_vram_mode
     )
     logger.info(f"Initialized Hunyuan3D with model {args.model_path}/{args.subfolder} on {device}")

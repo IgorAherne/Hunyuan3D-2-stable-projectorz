@@ -180,13 +180,13 @@ def install_dependencies():
         
         # List of packages to install with pip
         packages_cuda124 = [
-            ("pip install -r requirements.txt", "Installing basic dependencies"),
             (f"pip install torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1 --index-url https://download.pytorch.org/whl/cu124", "Installing PyTorch 2.5.1 with CUDA 12.4"),
+            ("pip install -r requirements.txt", "Installing basic dependencies"), # install AFTER the pytorch
         ]
 
         packages_cuda128 = [
-            ("pip install -r requirements.txt", "Installing basic dependencies"),
             (f"pip install --pre torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/nightly/cu128", "Installing PyTorch with CUDA 12.8"),
+            ("pip install -r requirements.txt", "Installing basic dependencies"), # install AFTER the pytorch
         ]
         
         # Local wheel files
