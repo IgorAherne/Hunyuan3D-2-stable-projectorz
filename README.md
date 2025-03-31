@@ -1,7 +1,8 @@
 A One-click installer for Windows: (Python 3.11, Cuda 12.4 / 12.8)
 
 Repository for integration of Tencent Hunyan3D-2 with the [StableProjectorz](https://stableprojectorz.com/), a free AI-texturing tool.<br>
-Browser .bat files use original implementation, and StableProjectorz .bat files have additional memory optimizations for texturing.<br>
+
+StableProjectorz .bat files have additional memory optimizations for texturing. Browser .bat files use the original implementation.<br>
 Our Discord server: [here](https://discord.gg/aWbnX2qan2)
 
 <h2>If you want to install manually:</h2>
