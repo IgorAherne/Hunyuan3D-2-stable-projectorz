@@ -4,7 +4,7 @@ vgroup padl=4 padr=4 spacing=8 flexibleWidth=1
 
     single_multi_img_input  code_name=(single_multi_img_input)  visible_name=(single_multi_img_input)  content_min_num_needed=(make_meshes_and_tex:1, retexture:0 )
 
-    header visible_name=(Hunyuan multi-view supports up to 6 sides) color=(36,36,36,255)
+    header visible_name=(max 6 images; correct order:\nfront,  right,  back,  left,  top,  bot) color=(45,45,45,255)
     
     space minHeight=5
 

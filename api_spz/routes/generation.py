@@ -182,9 +182,16 @@ async def _run_pipeline_generate_3d(pil_images, arg):
                 if "mv" in state.model_path.lower():
                     # MV models always require a dictionary with view names
                     processed_images = {}
-                    view_names = ['front', 'back', 'left', 'right']
+                    view_mapping = [
+                        'front',  # 0° azimuth
+                        'right',  # 90° azimuth
+                        'back',   # 180° azimuth
+                        'left',   # 270° azimuth
+                        'top',    # 90° elevation (if available)
+                        'bottom'  # -90° elevation (if available)
+                    ]
                     
-                    # Process available images
+                    # Process available images using the correct mapping
                     for i, img in enumerate(pil_images):
                         if i < len(view_names):
                             processed_image = rembg(img.convert('RGB'))

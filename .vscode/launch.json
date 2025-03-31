@@ -36,6 +36,64 @@
             ],
             "console": "integratedTerminal",
             "justMyCode": true
+        },
+        {
+            "name": "Hunyuan3D Gradio - Single View (Low VRAM)",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/gradio_app.py",
+            "args": [
+                "--model_path", "tencent/Hunyuan3D-2mini", 
+                "--subfolder", "hunyuan3d-dit-v2-mini-turbo",
+                "--texgen_model_path", "tencent/Hunyuan3D-2",
+                "--device", "cuda",
+                "--host", "127.0.0.1",
+                "--port", "8080",
+                "--low_vram_mode",
+                "--enable_flashvdm",
+                "--cache-path", "gradio_cache" 
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "Hunyuan3D Gradio - Multi View (Low VRAM)",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/gradio_app.py",
+            "args": [
+                "--model_path", "tencent/Hunyuan3D-2mv", 
+                "--subfolder", "hunyuan3d-dit-v2-mv-turbo",
+                "--texgen_model_path", "tencent/Hunyuan3D-2",
+                "--device", "cuda",
+                "--host", "127.0.0.1", 
+                "--port", "8080",
+                "--low_vram_mode",
+                "--enable_flashvdm",
+                "--cache-path", "gradio_cache"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "Hunyuan3D Gradio - With Text to 3D",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/gradio_app.py",
+            "args": [
+                "--model_path", "tencent/Hunyuan3D-2mini", 
+                "--subfolder", "hunyuan3d-dit-v2-mini-turbo",
+                "--texgen_model_path", "tencent/Hunyuan3D-2",
+                "--device", "cuda",
+                "--host", "127.0.0.1", 
+                "--port", "8080",
+                "--low_vram_mode",
+                "--enable_flashvdm",
+                "--enable_t23d",
+                "--cache-path", "gradio_cache"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": true
         }
     ]
 }
