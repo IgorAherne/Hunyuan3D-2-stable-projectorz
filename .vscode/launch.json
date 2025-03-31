@@ -7,13 +7,14 @@
             "request": "launch",
             "program": "${workspaceFolder}/api_spz/main_api.py",
             "args": [
-                "--model-path", "tencent/Hunyuan3D-2mini", 
+                "--model_path", "tencent/Hunyuan3D-2mini", 
                 "--subfolder", "hunyuan3d-dit-v2-mini-turbo",
-                "--texgen-model-path", "tencent/Hunyuan3D-2",
+                "--texgen_model_path", "tencent/Hunyuan3D-2",
                 "--device", "cuda",
                 "--host", "127.0.0.1",
                 "--port", "7960",
-                "--low-vram-mode"
+                "--low_vram_mode",
+                "--enable_flashvdm"
             ],
             "console": "integratedTerminal",
             "justMyCode": true
@@ -24,13 +25,14 @@
             "request": "launch",
             "program": "${workspaceFolder}/api_spz/main_api.py",
             "args": [
-                "--model-path", "tencent/Hunyuan3D-2mv", 
+                "--model_path", "tencent/Hunyuan3D-2mv", 
                 "--subfolder", "hunyuan3d-dit-v2-mv-turbo",
-                "--texgen-model-path", "tencent/Hunyuan3D-2",
+                "--texgen_model_path", "tencent/Hunyuan3D-2",
                 "--device", "cuda",
                 "--host", "127.0.0.1",
                 "--port", "7960",
-                "--low-vram-mode"
+                "--low_vram_mode",
+                "--enable_flashvdm"
             ],
             "console": "integratedTerminal",
             "justMyCode": true

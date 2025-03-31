@@ -181,11 +181,13 @@ def install_dependencies():
         # List of packages to install with pip
         packages_cuda124 = [
             (f"pip install torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1 --index-url https://download.pytorch.org/whl/cu124", "Installing PyTorch 2.5.1 with CUDA 12.4"),
+            (f"pip install huggingface_hub", "Installing huggingface_hub"),
             ("pip install -r requirements.txt", "Installing basic dependencies"), # install AFTER the pytorch
         ]
 
         packages_cuda128 = [
             (f"pip install --pre torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/nightly/cu128", "Installing PyTorch with CUDA 12.8"),
+            (f"pip install huggingface_hub", "Installing huggingface_hub"),
             ("pip install -r requirements.txt", "Installing basic dependencies"), # install AFTER the pytorch
         ]
         
@@ -194,7 +196,7 @@ def install_dependencies():
             "custom_rasterizer": "whl-cuda124/custom_rasterizer-0.1-cp311-cp311-win_amd64.whl",
             "mesh_processor": "whl-cuda124/mesh_processor-0.1.0-cp311-cp311-win_amd64.whl",
         }
-        wheel_files_cuda128 = {
+        wheel_files_cuda128 = { 
             "custom_rasterizer": "whl-cuda128/custom_rasterizer-0.1-cp311-cp311-win_amd64.whl",
             "mesh_processor": "whl-cuda128/mesh_processor-0.1.0-cp311-cp311-win_amd64.whl",
         }
