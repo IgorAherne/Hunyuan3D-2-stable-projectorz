@@ -29,11 +29,6 @@ uvicorn==0.34.0
 rembg==2.0.65
 onnxruntime==1.21.0
 
-# PyTorch and related packages
-torch==2.1.2+cu118
-torchaudio==2.1.2+cu118
-torchvision==0.16.2+cu118
-
 # Dependencies and additional packages
 aiofiles==23.2.1
 annotated-types==0.7.0
