@@ -21,7 +21,7 @@ class GenerationArgForm:
         num_chunks: int = Form(80),
         mesh_simplify_ratio: float = Form(0.1),
         apply_texture: bool = Form(False),
-        texture_size: int = Form(1024),
+        texture_size: int = Form(2048),
         output_format: str = Form("glb"),
     ):
         self.seed = seed

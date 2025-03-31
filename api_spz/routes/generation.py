@@ -290,13 +290,6 @@ async def _run_pipeline_generate_glb(outputs, mesh_simplify_ratio:float, texture
                     state.unload_shape_model()  # CRITICAL: Unload shape model to free ~6GB VRAM for texture generation
                     state.optimize_texture_pipeline() #memory optimization
 
-                    # Update texture size in existing pipeline config
-                    if texture_size != state.texture_pipeline.config.texture_size:
-                        logger.info(f"Changing texture resolution from {state.texture_pipeline.config.texture_size} to {texture_size}")
-                        state.texture_pipeline.config.texture_size = texture_size
-                        # Also update the renderer's texture size
-                        state.texture_pipeline.render.set_default_texture_resolution(texture_size)
-
                     logger.info("Starting texture generation...")
                     textured_mesh = state.texture_pipeline(mesh, image=original_image)
                     mesh = textured_mesh
