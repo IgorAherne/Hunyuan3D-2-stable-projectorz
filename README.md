@@ -1,4 +1,4 @@
-A One-click installer for Windows: (Python 3.11, Cuda 11.8, Torch 2.1.2)
+A One-click installer for Windows: (Python 3.11, Cuda 12.4 / 12.8)
 
 Repository for integration with the [StableProjectorz](https://stableprojectorz.com/), a free AI-texturing tool.<br>
 Our Discord server: [here](https://discord.gg/aWbnX2qan2)
