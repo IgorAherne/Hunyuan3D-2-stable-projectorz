@@ -33,8 +33,12 @@ nvcc_flags = [
     '-gencode=arch=compute_86,code=sm_86',  # RTX 3090, etc.
     # Ada Lovelace
     '-gencode=arch=compute_89,code=sm_89',  # RTX 4090, etc.
+    # Blackwell
+    '-gencode=arch=compute_90,code=sm_90',  # RTX 5000 series, etc.
+    # Update PTX for forward compatibility
+    '-gencode=arch=compute_90,code=compute_90',
     # PTX for forward compatibility
-    '-gencode=arch=compute_89,code=compute_89',
+    '-gencode=arch=compute_90,code=compute_90',
 ]
 
 # build custom rasterizer
