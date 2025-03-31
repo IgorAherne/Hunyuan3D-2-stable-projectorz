@@ -1,3 +1,21 @@
+A One-click installer for Windows: (Python 3.11, Cuda 11.8, Torch 2.1.2)
+
+Repository for integration with the [StableProjectorz](https://stableprojectorz.com/), a free AI-texturing tool.<br>
+Our Discord server: [here](https://discord.gg/aWbnX2qan2)
+
+<h2>If you want to install manually:</h2>
+
+1) use python 3.11
+2) follow steps in `code/install.py` around line 175, method `install_dependencies()`
+3) you will need to pip install wheel files, find them in `code/whl` folder.
+4) launch via:
+- for browser `run-browser/run-gradio-turbo-multiview.bat`
+- for StableProjectorz program (with memory optimizations during texturing) via `run-projectorz/run-stableprojectorz-turbo-multiview.bat`
+
+<br>
+<h2>Original Hunyuan3D-2 Repo description:</h2>
+
+<br><br>
 [中文阅读](README_zh_cn.md)
 [日本語で読む](README_ja_jp.md)
 
