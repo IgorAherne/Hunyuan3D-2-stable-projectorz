@@ -21,6 +21,7 @@ xatlas==0.0.9
 
 # Demo only
 gradio==4.44.1
+gradio_client==1.3.0
 gradio_litmodel3d==0.0.1
 fastapi==0.115.6
 uvicorn==0.34.0
@@ -44,7 +45,6 @@ ffmpy==0.5.0
 filelock==3.13.1
 flatbuffers==25.2.10
 fsspec==2024.6.1
-gradio_client==1.8.0
 groovy==0.1.2
 h11==0.14.0
 httpcore==1.0.7
