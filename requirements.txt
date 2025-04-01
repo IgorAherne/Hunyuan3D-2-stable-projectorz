@@ -19,11 +19,9 @@ pymeshlab==2023.12.post3
 pygltflib==1.16.3
 xatlas==0.0.9
 
-# Training
-accelerate==1.5.2
-
 # Demo only
-gradio==5.23.1
+gradio==4.44.1
+gradio_litmodel3d==0.0.1
 fastapi==0.115.6
 uvicorn==0.34.0
 rembg==2.0.65
