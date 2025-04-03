@@ -118,10 +118,6 @@ app.add_middleware(
 # Include the generation routes
 app.include_router(generation_router)
 
-# Mount static files for downloads
-app.mount("/downloads", StaticFiles(directory=Path("temp/current_generation")), name="downloads")
-
-
 @app.get("/")
 async def root():
     return {

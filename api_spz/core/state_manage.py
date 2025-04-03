@@ -7,7 +7,7 @@ from hy3dgen.texgen import Hunyuan3DPaintPipeline
 from hy3dgen.rembg import BackgroundRemover
 
 
-logger = logging.getLogger("trellis")
+logger = logging.getLogger("hunyuan3d_api")
 
 @contextmanager
 def suppress_float16_cpu_warnings():

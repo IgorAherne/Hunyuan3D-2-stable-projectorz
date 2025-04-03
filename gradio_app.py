@@ -752,5 +752,6 @@ if __name__ == '__main__':
         torch.cuda.empty_cache()
     demo = build_app()
     app = gr.mount_gradio_app(app, demo, path="/")
+    print(f'')
     print(f"After launched, open a browser and enter {args.host}:{args.port} into url, as if it was a website:")
     uvicorn.run(app, host=args.host, port=args.port, workers=1)

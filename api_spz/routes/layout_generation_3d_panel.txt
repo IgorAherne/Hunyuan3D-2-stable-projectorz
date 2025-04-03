@@ -4,7 +4,7 @@ vgroup padl=4 padr=4 spacing=8 flexibleWidth=1
 
     single_multi_img_input  code_name=(single_multi_img_input)  visible_name=(single_multi_img_input)  content_min_num_needed=(make_meshes_and_tex:1, retexture:0 )
 
-    header visible_name=(max 6 images; correct order:\nfront,  right,  back,  left,  top,  bot) color=(45,45,45,255)
+    header visible_name=(max 6 images;   correct order:\nFRONT,   RIGHT,   BACK,   LEFT,   TOP,   BOT) color=(255,255,255,255)
     
     space minHeight=5
 
@@ -14,7 +14,7 @@ vgroup padl=4 padr=4 spacing=8 flexibleWidth=1
                 space minWidth=20  flexibleHeight=1  flexibleWidth=1
                 slider  code_name=(guidance_scale)  visible_name=(guidance\nscale)  min=1  max=10  default=5  flexibleHeight=1
                 space  minWidth=20  preferredWidth=30  flexibleHeight=1
-                slider  code_name=(num_inference_steps)  visible_name=(think\nsteps)  min=1  max=50  default=20  flexibleHeight=1
+                slider  code_name=(num_inference_steps)  visible_name=(think\nsteps)  min=1  max=50  default=12  flexibleHeight=1
                 space  minWidth=20   flexibleHeight=1  flexibleWidth=1
             
             hgroup bg.color=(255,255,255,10) bg.ppu=10 flexibleWidth=1

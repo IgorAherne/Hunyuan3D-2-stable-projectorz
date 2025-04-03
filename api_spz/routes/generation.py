@@ -27,7 +27,7 @@ from api_spz.core.models_pydantic import (
 
 router = APIRouter()
 
-logger = logging.getLogger("trellis") #was already setup earlier, during main.
+logger = logging.getLogger("hunyuan3d_api") #was already setup earlier, during main.
 
 cancel_event = asyncio.Event() # This event will be set by the endpoint /interrupt
 
@@ -334,7 +334,7 @@ async def ping():
     busy = is_generation_in_progress()
     return {
         "status": "running",
-        "message": "Trellis API is operational",
+        "message": "Hunyuan API is operational",
         "busy": busy
     }
 
