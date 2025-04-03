@@ -89,6 +89,7 @@ async def lifespan(app: FastAPI):
     print("\n" + "="*50)
     print(f"Hunyuan3D-StableProjectorz API Server v1.0.0")
     print(f"Server is active and listening on {args.host}:{args.port}")
+    logger.info(f"Now in StableProjectorz, enter the 3D mode, click on the connection button and enter {args.host}:{args.port}")
     print("="*50 + "\n")
     
     yield  # This is where the FastAPI application runs
