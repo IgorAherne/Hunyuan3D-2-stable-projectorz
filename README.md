@@ -1,4 +1,4 @@
-A One-click installer for Windows: (Python 3.11, Cuda 12.4 / 12.8)
+A [One-click installer for Windows](https://github.com/IgorAherne/Hunyuan3D-2-stable-projectorz/releases/tag/latest): (Python 3.11, Cuda 12.4 / 12.8)
 
 Repository for integration of Tencent Hunyan3D-2 with the [StableProjectorz](https://stableprojectorz.com/), a free AI-texturing tool.<br>
 
