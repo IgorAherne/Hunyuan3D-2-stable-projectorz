@@ -187,7 +187,7 @@ def install_dependencies():
         ]
 
         packages_cuda128 = [
-            (f"pip install --pre torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/nightly/cu128", "Installing PyTorch with CUDA 12.8"),
+            (f"pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128", "Installing PyTorch with CUDA 12.8"),
             (f"pip install huggingface_hub", "Installing huggingface_hub"),
             (f"pip install accelerate --no-deps", "Installing latest accelerate without dependencies"),
             ("pip install -r requirements.txt", "Installing basic dependencies"), # install AFTER the pytorch
