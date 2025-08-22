@@ -1,4 +1,4 @@
-A [One-click installer for Windows](https://github.com/IgorAherne/Hunyuan3D-2-stable-projectorz/releases/tag/latest): (Python 3.11, Cuda 12.4 / 12.8)
+A [One-click installer for Windows](https://github.com/IgorAherne/Hunyuan3D-2-stable-projectorz/releases/tag/latest): (Python 3.11, Cuda 12.8)
 
 Repository for integration of Tencent Hunyan3D-2 with the [StableProjectorz](https://stableprojectorz.com/), a free AI-texturing tool.<br>
 
@@ -8,7 +8,7 @@ Our Discord server: [here](https://discord.gg/aWbnX2qan2)
 <h2>If you want to install manually:</h2>
 
 1) use python 3.11
-2) follow steps in `code/install.py` around line 175, method `install_dependencies()`
+2) follow steps in `code/install.py` around line 189, method `install_dependencies()`
 3) you will need to pip install wheel files, find them in `code/whl` folder.
 4) launch via:
 - for browser `run-browser/run-gradio-turbo-multiview.bat`
