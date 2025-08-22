@@ -2,6 +2,7 @@ from contextlib import contextmanager
 import logging
 import torch
 from pathlib import Path
+from huggingface_hub import snapshot_download
 from hy3dgen.shapegen import Hunyuan3DDiTFlowMatchingPipeline, FloaterRemover, DegenerateFaceRemover, FaceReducer
 from hy3dgen.texgen import Hunyuan3DPaintPipeline
 from hy3dgen.rembg import BackgroundRemover
@@ -222,6 +223,7 @@ class HunyuanState:
             from shutil import rmtree
             rmtree(self.temp_dir)
 
+
     def _initialize_texture_pipeline(self, texgen_model_path, low_vram_mode=False):
         """Initialize texture pipeline with CPU device and memory optimizations"""
         try:
@@ -229,6 +231,12 @@ class HunyuanState:
             from hy3dgen.texgen import pipelines
             from hy3dgen.texgen.pipelines import Hunyuan3DTexGenConfig
             
+            # Use snapshot_download to get the absolute local path to the repository cache.
+            # This forces the from_pretrained method to use its simple, local-path logic.
+            logger.info(f"Resolving local path for texture model repository: {texgen_model_path}")
+            texture_model_local_path = snapshot_download(repo_id=texgen_model_path)
+            logger.info(f"Loading texture pipeline from repository root: {texture_model_local_path}")
+
             # Create a modified version with CPU device
             class CPUHunyuan3DTexGenConfig(Hunyuan3DTexGenConfig):
                 def __init__(self, light_remover_ckpt_path, multiview_ckpt_path):
@@ -243,7 +251,7 @@ class HunyuanState:
             
             # Load pipeline with selective warning suppression
             with suppress_float16_cpu_warnings():
-                self.texture_pipeline = Hunyuan3DPaintPipeline.from_pretrained(texgen_model_path)
+                self.texture_pipeline = Hunyuan3DPaintPipeline.from_pretrained(texture_model_local_path)
             
             # Restore the original class
             pipelines.Hunyuan3DTexGenConfig = original_config_class
