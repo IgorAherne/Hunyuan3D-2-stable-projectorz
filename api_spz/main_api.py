@@ -62,7 +62,9 @@ parser.add_argument("--device", type=str, default=None, help="Device to use (cud
 parser.add_argument("--enable_flashvdm", action="store_true", help="Enable FlashVDM acceleration")
 parser.add_argument("--low_vram_mode", action="store_true", help="Enable low VRAM mode with CPU offloading")
 
-args = parser.parse_args()
+args, unknown = parser.parse_known_args()
+if unknown:
+    logger.warning(f"Unrecognized arguments: {unknown}")
 
 # Print startup information
 print("\n" + "="*50)

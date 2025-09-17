@@ -658,7 +658,9 @@ if __name__ == '__main__':
     parser.add_argument('--enable_flashvdm', action='store_true')
     parser.add_argument('--compile', action='store_true')
     parser.add_argument('--low_vram_mode', action='store_true')
-    args = parser.parse_args()
+    args, unknown = parser.parse_known_args()
+    if unknown:
+        logger.warning(f"Unrecognized arguments: {unknown}")
 
     SAVE_DIR = args.cache_path
     os.makedirs(SAVE_DIR, exist_ok=True)
